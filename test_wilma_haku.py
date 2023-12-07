@@ -82,8 +82,8 @@ def test_kotitehtavat(page:Page, aihe:str):
         data.append({"title": aihe, "due": due_date, "notes": notes})
 
     # Kirjoitetaan data tiedostoon
-    test_tallenna_data_tiedostoon(data, "output.txt")
-    test_tallenna_data_tiedostoon(event, "events.txt")
+    test_tallenna_data_tiedostoon(data, "data/output.txt")
+    test_tallenna_data_tiedostoon(event, "data/events.txt")
 
 #tallennetaan data tiedostoon
 def test_tallenna_data_tiedostoon(data, file_name):

@@ -5,5 +5,6 @@ __pycache__
 config.py
 token.json
 credentials.json
-events.txt
-output.txt
+data/*txt
+# events.txt
+# output.txt

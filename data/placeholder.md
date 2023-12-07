@@ -1,0 +1,1 @@
+Kaikki tektitiedostot, jotka ovat .txt päätteisiä ei näy GitHubissa.
