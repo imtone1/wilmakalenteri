@@ -1,0 +1,9 @@
+.venv
+.vscode
+__pycache__
+.pytest_cache
+config.py
+token.json
+credentials.json
+events.txt
+output.txt
