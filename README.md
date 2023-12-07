@@ -8,8 +8,11 @@
 
 ## Kuvaus
 
-Wilma kalenteriin on python sovellus, joka hakee Wilman kalenterista kotitehtävät ja lisää ne käyttäjän valitsemaan kalenteriin.
+Wilma kalenteriin on python sovellus, joka hakee Wilmasta kotitehtävät ja lisää ne käyttäjän valitsemaan Google kalenteriin.
 
+### Tausta 
+
+Halusin luoda sovelluksen, jolla voisin helposti lisätä Wilman kotitehtävät Google kalenteriin. Tämä helpottaa lasten kotitehtävien seuraamista. 
 
 ## Asennus
 
