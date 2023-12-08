@@ -22,7 +22,7 @@ def main():
   creds = None
   # The file token.json stores the user's access and refresh tokens, and is
   # created automatically when the authorization flow completes for the first
-  # time.My Project 48334
+  # time.
   if os.path.exists("token.json"):
     creds = Credentials.from_authorized_user_file("token.json", SCOPES)
   # If there are no (valid) credentials available, let the user log in.
@@ -48,37 +48,11 @@ def main():
     except HttpError as error:
         print(f"An error occurred: {error}")
     try:
-        # create_event(
-        # service,
-        # "Test event",
-        # "This is a test event",
-        # "2023-08-12"
-        # )
-        # # Load events from file
-        # with open('data/new_data.txt', 'r', encoding='utf-8') as file:
-        #     events = json.load(file)
-        # # Iterate over events and create them
-        # for event in events:
-        #     summary = event['summary'].strip()
-        #     description = event['description'].strip()
-        #     start_time = event['start']
-        #     stop_time = event['stop']
-        #     print(summary, description, start_time, stop_time )
-        #     # Create the event
-            # create_event(service, summary, description, start_time, stop_time )
-         
-       #puhdistetaan tiedosto seuraavaa kertaa varten
-    #     with open('data/new_data.txt', 'w'):
-    #       pass
-    # 
     # #tietokannasta
         hae_tietokantasta(service)
         print("Tietokannasta haettu")
     except HttpError as error:
         print(f"An error occurred: {error}")
-
-      
-         
 
   except HttpError as error:
     print(f"An error occurred in Google Calendar calling: {error}")
