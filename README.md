@@ -52,13 +52,15 @@ Asenna tarvittavat kirjastot komennolla
 pip install -r requirements.txt
 ```
 
-Asenna lisäksi Playwright selain ajuri komennolla
+Asenna lisäksi Playwright selain ajuri komennolla. Lisätietoa Playwrightista löytyy [täältä](https://playwright.dev/python/docs/intro)
 
 ```bash
 playwright install
 ```
 
 Lisäksi tarvitset tätä sovellusta varten Google Calendar API:n. Tarkat ohjeet löytyvät Googlen omilta sivuilta [Python quickstart](https://developers.google.com/calendar/api/quickstart/python)
+
+Tietokantana on SQLite3. Lisätietoa SQLite3:sta löytyy [täältä](https://docs.python.org/3/library/sqlite3.html)
 
 ## Käyttö
 
