@@ -1,7 +1,8 @@
-import datetime
+from datetime import datetime, timedelta
 #Google API
 import os.path
 import json
+import sqlite3
 
 # config.py
 from config import calendarId
@@ -54,23 +55,31 @@ def main():
         # "This is a test event",
         # "2023-08-12"
         # )
-        # Load events from file
-        with open('data/new_data.txt', 'r', encoding='utf-8') as file:
-            events = json.load(file)
-        # Iterate over events and create them
-        for event in events:
-            summary = event['summary'].strip()
-            description = event['description'].strip()
-            start_time = event['start']
-            stop_time = event['stop']
-            print(summary, description, start_time, stop_time )
-            # Create the event
-            create_event(service, summary, description, start_time, stop_time )
+        # # Load events from file
+        # with open('data/new_data.txt', 'r', encoding='utf-8') as file:
+        #     events = json.load(file)
+        # # Iterate over events and create them
+        # for event in events:
+        #     summary = event['summary'].strip()
+        #     description = event['description'].strip()
+        #     start_time = event['start']
+        #     stop_time = event['stop']
+        #     print(summary, description, start_time, stop_time )
+        #     # Create the event
+            # create_event(service, summary, description, start_time, stop_time )
+         
        #puhdistetaan tiedosto seuraavaa kertaa varten
-        with open('data/new_data.txt', 'w'):
-          pass
+    #     with open('data/new_data.txt', 'w'):
+    #       pass
+    # 
+    # #tietokannasta
+        hae_tietokantasta(service)
+        print("Tietokannasta haettu")
     except HttpError as error:
         print(f"An error occurred: {error}")
+
+      
+         
 
   except HttpError as error:
     print(f"An error occurred in Google Calendar calling: {error}")
@@ -113,7 +122,7 @@ def create_event(service, summary, description, start_time, stop_time):
 
 def show_events(service):
     # Call the Calendar API
-   now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indicates UTC time
+   now = datetime.utcnow().isoformat() + "Z"  # 'Z' indicates UTC time
    print("Getting the upcoming 10 events")
    events_result = (
         service.events()
@@ -135,7 +144,23 @@ def show_events(service):
     # Prints the start and name of the next 10 events
    for event in events:
       start = event["start"].get("dateTime", event["start"].get("date"))
-      print(start, event["summary"]) 
+      print(start, event["summary"])
+
+def hae_tietokantasta(service):
+    sqliteConnection = sqlite3.connect("data/events.db")
+    cursor = sqliteConnection.cursor()
+    #otetaan huomioon aikavyöhyke
+    now = datetime.utcnow() + timedelta(hours=3, minutes=1)
+    #muotoillaan sopivaan muotoon
+    now_str = now.strftime('%Y-%m-%d %H:%M:%S')
+    print(now_str)
+    #Valitaan kaikki
+    cursor.execute(f"SELECT * FROM events WHERE created > '{now_str}'")
+    rows = cursor.fetchall()
+
+    for row in rows:
+        create_event(service, row[1], row[2], row[3], row[4] )
+        print("Creating event: ", row[1], row[2], row[3], row[4] )
 
 if __name__ == "__main__":
   main()
