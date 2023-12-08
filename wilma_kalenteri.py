@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 #Google API
 import os.path
-import json
 import sqlite3
 
 # config.py
@@ -149,8 +148,8 @@ def show_events(service):
 def hae_tietokantasta(service):
     sqliteConnection = sqlite3.connect("data/events.db")
     cursor = sqliteConnection.cursor()
-    #otetaan huomioon aikavyöhyke
-    now = datetime.utcnow() + timedelta(hours=3, minutes=1)
+    #minuutti sitten
+    now = datetime.utcnow() - timedelta( minutes=1)
     #muotoillaan sopivaan muotoon
     now_str = now.strftime('%Y-%m-%d %H:%M:%S')
     print(now_str)
