@@ -66,3 +66,26 @@ Tietokantana on SQLite3. Lisätietoa SQLite3:sta löytyy [täältä](https://doc
 
 Muuta tiedostossa configfile.py olevat muuttujat haluamiksesi ja nimeä tiedosto config.py tiedostoksi.
 
+## BeautifulSoup
+
+Tiedosto beautifulsoup.py käyttää BeautifulSoup kirjastoa Wilman sivujen parsimiseen. Lisätietoa BeautifulSoupista löytyy [täältä](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+
+Sen käyttö saattaa vaatia Wilma sivuston tarkempaa tutkimista.
+
+## Kehittäjätyökalut (Developer Tools)
+
+Navigoi Wilma sivustolle ja avaa kehittäjätyökalut joko painamalla F12 tai oikealla hiiren näppäimellä ja valitse "Inspect". 
+
+Navigoi kehittäjätyökaluissa "Network" välilehdelle. Täppää "Preserve log" ja yritä kirjautua (pelkkä "Kirjaudu sisään" ilman tunnuksia riittää).
+
+Nyt kehittäjätyökaluissa pitäisi näkyä login POST pyyntö. Etsi login pyyntö. Headers välilehdeltä löytyy tarvitsemanne payload tiedot. Nämä ovat otsikomme.
+
+![Headers](./data/kuvat/network_tab.JPG)
+
+Lisäksi tarvitsemme session cookien. Nämä löytyvät "Cookies" välilehdeltä tai samalta paikasta, josta löysimme payload tiedot "Headers" välilehdeltä. Tarkista Set-Cookie cookien nimi.
+
+![Cookies](./data/kuvat/setcookie.JPG)
+
+
+
+
