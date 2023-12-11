@@ -3,8 +3,12 @@ from datetime import datetime, timedelta
 import os.path
 import sqlite3
 
-# config.py
-from config import calendarId
+# .env tiedostosta
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+calendarId = os.environ["CALENDAR_FAMILY"]
 
 #Google API
 from google.auth.transport.requests import Request
@@ -122,18 +126,22 @@ def show_events(service):
 def hae_tietokantasta(service):
     sqliteConnection = sqlite3.connect("data/events.db")
     cursor = sqliteConnection.cursor()
-    #minuutti sitten
-    now = datetime.utcnow() - timedelta( minutes=1)
+    #minuutti sitten ota huomioon aikavyöhyke
+    now = datetime.utcnow() - timedelta(hours=4, minutes=1)
     #muotoillaan sopivaan muotoon
     now_str = now.strftime('%Y-%m-%d %H:%M:%S')
     print(now_str)
     #Valitaan kaikki
-    cursor.execute(f"SELECT * FROM events WHERE created > '{now_str}'")
-    rows = cursor.fetchall()
+    try:
+      cursor.execute(f"SELECT * FROM events WHERE created > '{now_str}'")
+      rows = cursor.fetchall()
 
-    for row in rows:
-        create_event(service, row[1], row[2], row[3], row[4] )
-        print("Creating event: ", row[1], row[2], row[3], row[4] )
+      for row in rows:
+          create_event(service, row[1], row[2], row[3], row[4] )
+          print("Creating event: ", row[1], row[2], row[3], row[4] )
+    except HttpError as error:
+        print(f"An error occurred in selecting events: {error}")
+   
 
 if __name__ == "__main__":
   main()

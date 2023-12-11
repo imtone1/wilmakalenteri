@@ -1,0 +1,8 @@
+# Täytä omat tiedot ja tallenna tiedosto .env nimellä ennen sovelluksen käyttöä
+
+ATLAS_URI=mongodb+srv://<username>:<password>@sandbox.lqlql.mongodb.net/?retryWrites=true&w=majority
+CALENDAR_FAMILY=<kalenterin_id>.calendar.google.com
+WILMA_URL=wilman soite yleensä .inschool.fi loppuinen
+WILMA_LOGIN=kayttajatunnus
+WILMA_PASSWORD=salasana
+WILMA_STUDENT=oppilaan nimi

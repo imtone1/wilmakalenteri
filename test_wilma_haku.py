@@ -2,8 +2,12 @@
 from playwright.sync_api import Page
 import sqlite3
 import json
-# config.py
-from config import login_url, login, password, wilma_person
+
+# .env tiedostosta
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from datetime import datetime, timedelta
 
 def test_yhdista_tietokantaan():
@@ -17,7 +21,7 @@ def test_yhdista_tietokantaan():
     except sqlite3.Error as error:
         print('Error occurred - ', error)
  
-def test_luo_tietokanta(cursor):
+def test_luo_tietokanta():
     sqliteConnection = sqlite3.connect("data/events.db")
     cursor = sqliteConnection.cursor()
     try:
@@ -35,7 +39,7 @@ def test_luo_tietokanta(cursor):
                                         created text DEFAULT CURRENT_TIMESTAMP
                                     ); """
         cursor.execute(query)
-        cursor.close()
+        # cursor.close()
     # Handle errors
     except sqlite3.Error as error:
         print('Error occurred - ', error)
@@ -60,23 +64,24 @@ def test_lisaa_tietokantaan(event, cursor, connection):
     except sqlite3.Error as error:
         print('Error occurred - ', error)
 
-def test_lisaa_tietokantaantesti():
-    try:
-        connection = sqlite3.connect("data/events.db")
-        cursor = connection.cursor()
-        event = f"'testititle', 'notesdescription', '2023-08-21T00:00:00', '2023-08-21T01:00:00'"
-        cursor.execute(f"""
-        INSERT INTO events (summary, description, start, stop) VALUES
-            ({event})""")
-        connection.commit()
-        cursor.close()
-    except sqlite3.Error as error:
-        print('Error occurred - ', error)
+# def test_lisaa_tietokantaantesti():
+#     try:
+#         connection = sqlite3.connect("data/events.db")
+#         cursor = connection.cursor()
+#         event = f"'testititle', 'notesdescription', '2023-08-21T00:00:00', '2023-08-21T01:00:00'"
+#         cursor.execute(f"""
+#         INSERT INTO events (summary, description, start, stop) VALUES
+#             ({event})""")
+#         connection.commit()
+#         cursor.close()
+#     except sqlite3.Error as error:
+#         print('Error occurred - ', error)
     
 #2. Valitse oppilas
 def test_valitse_oppilas(page: Page, oppilas: str):
     #valitaan oppilas
     page.locator('h1').locator('a:has-text("'+oppilas+'")').click()
+    test_luo_tietokanta()
 
 #3. Valitse aine
 def test_jaksonopinnot(page:Page):
@@ -130,9 +135,7 @@ def test_kotitehtavat(page:Page, aihe:str):
     
     # Luodaan tietokanta
     cursor, connection = test_yhdista_tietokantaan()
-    test_luo_tietokanta(cursor)
 
-    
     for row in rows:
         # Ensimmäinen solu sisältää päivämäärän
         date_str = row.query_selector("td:nth-child(1)").text_content()
@@ -147,7 +150,6 @@ def test_kotitehtavat(page:Page, aihe:str):
         # Muotoillaan tapahtuma
         uusi_tapahtuma = f"'{aihe}', '{notes}', '{start}', '{stop}'"
         test_lisaa_tietokantaan(uusi_tapahtuma, cursor, connection)
-    test_hae_tietokantasta()
    
 
 #tallennetaan data tiedostoon
@@ -158,9 +160,14 @@ def test_tallenna_data_tiedostoon(data, file_name):
 
 #1. Kirjaudu sisään
 def test_kirjaudu(page: Page):
+    login_url = os.environ["WILMA_URL"]
+    login = os.environ["WILMA_LOGIN"]
+    password = os.environ["WILMA_PASSWORD"]
+    wilma_student = os.environ["WILMA_STUDENT"]
     page.goto(login_url)
     page.locator('#login-frontdoor').fill(login)
     page.locator("#password").fill(password)
     page.locator('input:has-text("Kirjaudu sisään")').click()
-    test_valitse_oppilas(page, wilma_person)
+    test_valitse_oppilas(page, wilma_student)
     test_jaksonopinnot(page)
+    test_hae_tietokantasta()

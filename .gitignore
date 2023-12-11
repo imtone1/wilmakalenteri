@@ -9,3 +9,4 @@ data/*txt
 data/*db
 # events.txt
 # output.txt
+.env
