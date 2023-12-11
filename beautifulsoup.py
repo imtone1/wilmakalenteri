@@ -5,8 +5,11 @@ from dotenv import load_dotenv
 from bs4 import BeautifulSoup as bs
 import requests
 
-import json
-from datetime import datetime, timedelta
+# import json
+from datetime import datetime, timedelta, timezone
+
+from pymongo import MongoClient
+
 
 load_dotenv()
 
@@ -15,6 +18,13 @@ def test_kirjaudu():
     login = os.environ["WILMA_LOGIN"]
     password = os.environ["WILMA_PASSWORD"]
     wilma_student = os.environ["WILMA_STUDENT"]
+
+    #mongoDB
+    atlas_uri = os.environ["ATLAS_URI"]
+    client = MongoClient(atlas_uri)
+    db = client["wilma"]
+    kokeet_db = db.kokeet
+    created = datetime.now(tz=timezone.utc)
 
 
     URL = login_url
@@ -34,8 +44,6 @@ def test_kirjaudu():
     print(login_req.status_code)
     #tallennetaan varmuuden vuoksi
     cookies = login_req.cookies
-    # soup = bs(s.get(URL + 'watchlist').text, 'html.parser')
-    # tbody = soup.find('table', id='companies')
     soup = bs(login_req.text, 'html.parser')
     # print(soup)
     # Etsitään linkki, joka sisältää oppilaan nimen
@@ -46,12 +54,6 @@ def test_kirjaudu():
         # Siirrytään oppilaan sivulle
         oppilaansivu=s.get(os.environ["WILMA_URL"] + oppilas_url+"/exams/calendar")
         soup=bs(oppilaansivu.text, 'html.parser')
-        # print(soup)
-        # kokeet = soup.find('main', id="main-content").findAll('table')
-        # print(kokeet)
-        # print(kokeet.text)
-        # kokeet1 = soup.find('a', string="Kokeet")
-        # print(kokeet1)
         tables = soup.select('#main-content .table')
 
         data = []
@@ -68,33 +70,65 @@ def test_kirjaudu():
             subject = subject_list[0].strip() + subject_list[1].strip() + subject_list[2].strip()
             pvm = start.split(' ')[1]
             start_obj = datetime.strptime(pvm, "%d.%m.%Y")
-            start = start_obj.isoformat()
+            start_aamu = start_obj + timedelta(hours=6)
+            start = start_aamu.isoformat()
             # Luodaan loppuaika, joka on yksi tunti alkamisen jälkeen
             yksitunti = start_obj + timedelta(hours=1)
             stop = yksitunti.isoformat()
-
-            data.append({
+                
+            koe = {
                 "summary": subject,
                 "description": description,
                 'start': {
-                'dateTime': start,
-                'timeZone': "Europe/Helsinki",
+                    'dateTime': start,
+                    'timeZone': "Europe/Helsinki",
                 },
                 'end': {
-                'dateTime': stop,
-                'timeZone': "Europe/Helsinki",
-                } })
+                    'dateTime': stop,
+                    'timeZone': "Europe/Helsinki",
+                },
+                'created': created
+                }
+            
+            # data.append(koe)
+            # post_id = kokeet_db.insert_one(koe).inserted_id
+            # post_id
+            # Tarkistetaan, onko samanlainen dokumentti jo olemassa
+            exists = kokeet_db.find_one({"summary": koe["summary"], "description": koe["description"]})
 
-        # Muuntaa kerätyt tiedot JSON-muotoon
-        json_data = json.dumps(data, indent=4, ensure_ascii=False)
+            if not exists:
+                # Jos samanlaista dokumenttia ei löydy, lisätään se kokoelmaan
+                kokeet_db.insert_one(koe)
+                print("Dokumentti lisätty")
+            else:
+                print("Dokumentti on jo olemassa")
 
-        # Tulostaa JSON-muotoiset tiedot
-        print(json_data)
+        #     # Muunnetaan datetime-objektit
+        #     start_iso = start.isoformat() if isinstance(start, datetime) else start
+        #     stop_iso = stop.isoformat() if isinstance(stop, datetime) else stop
+        #     created_iso = created.isoformat() if isinstance(created, datetime) else created
 
+        #     data = []
+        #     koe1 = {
+        #         "summary": subject,
+        #         "description": description,
+        #         'start': {
+        #             'dateTime': start_iso,
+        #             'timeZone': "Europe/Helsinki",
+        #         },
+        #         'end': {
+        #             'dateTime': stop_iso,
+        #             'timeZone': "Europe/Helsinki",
+        #         },
+        #         'created': created_iso
+        #     }
+        #     data.append(koe1)
+        # # JSON-muotoon
+        # json_data = json.dumps(data, indent=4, ensure_ascii=False)
+        # print(json_data)
 
     else:
         print("Oppilasta ei löytynyt")
 
-# Käyttöesimerkki
 test_kirjaudu()
 
