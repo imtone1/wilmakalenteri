@@ -16,10 +16,8 @@ def wilma_exams(login_req, session):
     wilma_student = os.environ["WILMA_STUDENT"]
 
     #mongoDB
-    atlas_uri = os.environ["ATLAS_URI"]
-    client = MongoClient(atlas_uri)
-    db = client["wilma"]
-    kokeet_db = db.kokeet
+    kokeet_db = connect_mongodb("kokeet")
+
     created = datetime.now(tz=timezone.utc)
 
 
@@ -127,7 +125,7 @@ def wilma_signin():
             }
     login_req = session.post(URL + LOGIN_ROUTE, headers=HEADERS, data=login_payload)
     #jos statuskoodi on 200, niin kirjautuminen onnistui
-    print(login_req.status_code)
+    print(f"Wilma login status code: {login_req.status_code}")
     #tallennetaan varmuuden vuoksi
     cookies = login_req.cookies
 
@@ -149,7 +147,7 @@ def get_items_mongodb(collection, query={}):
         print(doc)
 
 def main():
-    # wilma_exams(wilma_signin()[0], wilma_signin()[1])
+    wilma_exams(*wilma_signin())
     one_minute_ago = datetime.now() - timedelta(hours=10, minutes=1)
     query = {"created": {"$gte": one_minute_ago}}
 
