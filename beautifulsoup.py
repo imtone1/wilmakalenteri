@@ -38,12 +38,58 @@ def wilma_student(login_req, session, wilma_student=WILMA_STUDENT):
     else:
         print("There is no such student.")
 
+def wilma_homework(session, oppilas_url):
+    # Siirrytään oppilaan sivulle
+    oppilaansivu=session.get(os.environ["WILMA_URL"] + oppilas_url)
+    #mongoDB
+    kokeet_db = connect_mongodb("kotitehtavat")
+    created = datetime.now(tz=timezone.utc)
+
+    soup=bs(oppilaansivu.text, 'html.parser')
+    tables = soup.select('#main-content .table', {"class": "table index-table"})
+
+    links = []
+    for table in tables:
+        rows = table.find_all('tr')
+        for row in rows:
+            link_element = row.select_one('td:nth-of-type(1) a')
+            if link_element:
+                link_url = link_element.get('href')
+                links.append(link_url)
+    print(links)
+    # Siirrytään aineen sivulle
+    kotitehtavasivu=session.get(os.environ["WILMA_URL"] + "/!0434277/groups/180773")
+    
+    soup=bs(kotitehtavasivu.content, 'html.parser')
+    
+    # Sellainen taulu, jossa on "Kotitehtävät" theadissa
+    target_table = None
+    for table in soup.find_all("table"):
+        if table.find("thead"):
+            th_elements = table.find("thead").find_all("th")
+            if any("Kotitehtävät" in th.get_text() for th in th_elements):
+                target_table = table
+                break
+
+    # onko tällä tbody
+    if target_table and target_table.find("tbody"):
+        rows = target_table.find("tbody").find_all("tr")
+        for row in rows:
+            # jokaiselta riviltä haetaan solut
+            cells = row.find_all("td")
+            if len(cells) >= 2:
+                pvm = cells[0].get_text(strip=True)
+                notes = cells[1].get_text(strip=True)
+                print(f"Date: {pvm}, Notes: {notes}")
+    else:
+        print("Table with 'Kotitehtävät' not found or no tbody.")
+
 #Wilman kokeiden haku sekä tallennus tietokantaan
 def wilma_exams(session, oppilas_url):
         #mongoDB
         kokeet_db = connect_mongodb("kokeet")
         created = datetime.now(tz=timezone.utc)
-        # Siirrytään oppilaan sivulle
+        # Siirrytään oppilaiden kokeiden sivulle
         oppilaansivu=session.get(os.environ["WILMA_URL"] + oppilas_url+"/exams/calendar")
         soup=bs(oppilaansivu.text, 'html.parser')
         tables = soup.select('#main-content .table')
@@ -223,7 +269,8 @@ def create_calendar_event(event, calendarID):
   print(f"Event created: {event.get('htmlLink')}")
 
 def main():
-    wilma_exams(*wilma_student(*wilma_signin()))
+    #wilma_exams(*wilma_student(*wilma_signin()))
+    wilma_homework(*wilma_student(*wilma_signin()))
 
     # one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
     # query = {"created": {"$gte": one_minute_ago}}
