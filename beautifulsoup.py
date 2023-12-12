@@ -57,10 +57,16 @@ def wilma_subject(session, oppilas_url):
                 link_url = link_element.get('href')
                 link_text = link_element.get_text(separator=' ', strip=True)
                 links.append(link_text)
-                wilma_homeworks(session, link_url)
+                wilma_homeworks(session, link_url, link_text)
     print(f"Links: {links}")
 
-def wilma_homeworks(session, link_url):
+def wilma_homeworks(session, link_url, subject_text):
+
+     #mongoDB
+    db = connect_mongodb("kotitehtavat")
+    
+    created = datetime.now(tz=timezone.utc)
+
     # Siirrytään aineen sivulle
     kotitehtavasivu=session.get(os.environ["WILMA_URL"] + link_url)
     
@@ -82,9 +88,19 @@ def wilma_homeworks(session, link_url):
             # jokaiselta riviltä haetaan solut
             cells = row.find_all("td")
             if len(cells) >= 2:
-                pvm = cells[0].get_text(strip=True)
-                notes = cells[1].get_text(strip=True)
-                print(f"Date: {pvm}, Notes: {notes}")
+                start = cells[0].get_text(strip=True)
+                description = cells[1].get_text(strip=True)
+
+                print(f"Date: {start}, Notes: {description}")
+                
+                start_obj = datetime.strptime(start, "%d.%m.%Y")
+                start_aamu = start_obj + timedelta(hours=1)
+                start = start_aamu.isoformat()
+                # Luodaan loppuaika, joka on yksi tunti alkamisen jälkeen
+                yksitunti = start_aamu + timedelta(hours=2)
+                stop = yksitunti.isoformat()
+                subject=subject_text
+                add_unique_item_mongodb(subject, description, start, stop, created, db)
     else:
         print("Table with 'Kotitehtävät' not found or no tbody.")
 
@@ -188,6 +204,7 @@ def find_items_mongodb(collection, query={}):
     return documents
 
 #palauttaa refaktoroidun listan google kalenteriin vietäväksi
+#Käytännössä poistetaan created
 def refactor_events(events):
     events_list = []
 
