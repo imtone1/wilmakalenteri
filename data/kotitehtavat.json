@@ -1,0 +1,139 @@
+[
+    {
+      "type": "daily",
+      "text": "Täytä astianpesukoneen",
+      "notes": "Astioiden esipesu ja astiankoneen täyttäminen",
+      "frequency": "daily",
+      "priority": "1",
+      "difficulty": "1"
+    },
+    {
+      "type": "daily",
+      "text": "Pura astiat astianpesukoneesta",
+      "notes": "Tyhjennä astianpesukone pestyistä astioista",
+      "frequency": "daily",
+      "priority": "1",
+      "difficulty": "1"
+    },
+    {
+      "type": "daily",
+      "text": "Pyyhi työtasot",
+      "notes": "Puhdista keittiön työtasot",
+      "frequency": "daily",
+      "priority": "1",
+      "difficulty": "1"
+    },
+    {
+      "type": "daily",
+      "text": "Puhdista liesi ja nupit",
+      "notes": "Puhdista keittiön liesi ja säätimet",
+      "frequency": "daily",
+      "priority": "1.5"
+    },
+    {
+      "type": "daily",
+      "text": "Pese hamsterin ruokakupit ja ruoki hamsteri",
+      "notes": "Puhdista hamsterin ruokakupit ja anna ruokaa",
+      "frequency": "daily",
+      "priority": "1"
+    },
+    {
+      "type": "daily",
+      "text": "Puhdista hamsterin purut",
+      "notes": "Puhdista ja vaihda hamsterin häkin purut",
+      "frequency": "daily",
+      "priority": "1.5"
+    },
+    {
+      "type": "daily",
+      "text": "Järjestä omat tavarat",
+      "notes": "Laita henkilökohtaiset tavarat paikoilleen",
+      "frequency": "daily",
+      "priority": "1"
+    },
+    {
+      "type": "todo",
+      "text": "Käy läpi ja heitä sanomalehdet ja paperit pois",
+      "notes": "Siivoa keittiöstä vanhat sanomalehdet ja paperit",
+      "everyX": "3",
+      "priority": "1"
+    },
+    {
+      "type": "todo",
+      "text": "Puhdista lavuaari ja taso",
+      "notes": "Puhdista kylpyhuoneen lavuaari ja taso",
+      "everyX": "3",
+      "priority": "1.5"
+    },
+    {
+      "type": "todo",
+      "text": "Pyyhi peilit",
+      "notes": "Pyyhi ja puhdista kylpyhuoneen peilit",
+      "everyX": "3",
+      "priority": "1"
+    },
+    {
+      "type": "todo",
+      "text": "Moppaa lattiat",
+      "notes": "Puhdista lattiat moppaamalla",
+      "frequency": "weekly",
+      "priority": "1.5"
+    },
+    {
+      "type": "todo",
+      "text": "Pölyjen pyyhkiminen",
+      "notes": "Pyyhi pölyt pinnoilta",
+      "frequency": "weekly",
+      "priority": "1" 
+    },
+    {
+      "type": "todo",
+      "text": "Imuroi",
+      "notes": "Imuroi kaikki huoneet",
+      "frequency": "weekly",
+      "priority": "1.5"
+    },
+    {
+      "type": "todo",
+      "text": "Puhdista alueesi",
+      "notes": "Siivoa oma alueesi. Sisältää tavaroitesi järjestelyn ja alueesi pintojen pyyhkiminen.",
+      "frequency": "weekly",
+      "priority": "1" 
+    },
+    {
+      "type": "todo",
+      "text": "Pyyhi pölyt",
+      "notes": "Pyyhi pölyt kaikilta pinnoillta",
+      "frequency": "monthly",
+      "priority": "1" 
+    },
+    {
+      "type": "todo",
+      "text": "Pese ikkunat ja ikkunalaudat tahroilta",
+      "notes": "Puhdista ikkunat ja ikkunalaudat",
+      "frequency": "monthly",
+      "priority": "2"
+    },
+    {
+      "type": "todo",
+      "text": "Lakaise terassi",
+      "notes": "Puhdista terassi lakaisemalla",
+      "frequency": "yearly",
+      "priority": "1.5"
+    },
+    {
+      "type": "todo",
+      "text": "Puhdista terassikalusteet ja ulkotyynyt",
+      "notes": "Pese ja puhdista terassikalusteet ja ulkotyynyt",
+      "frequency": "yearly",
+      "priority": "1.5"
+    },
+    {
+      "type": "todo",
+      "text": "Järjestä ja puhdista ulkovarasto",
+      "notes": "Siivoa ja järjestele ulkovarasto",
+      "frequency": "yearly",
+      "priority": "2",
+      "difficulty": "2"
+    }
+  ]
