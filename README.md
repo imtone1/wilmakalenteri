@@ -89,16 +89,19 @@ Lisäksi tarvitsemme session cookien. Nämä löytyvät "Cookies" välilehdeltä
 
 ## Funktiot
 
-| Funktio                      | Kuvaus                                  | Parametrit                                  | Palauttaa                                  |
-|------------------------------|-----------------------------------------|---------------------------------------------|--------------------------------------------|
-| `wilma_exams`                | Hakee Wilman kokeet ja tallentaa ne tietokantaan. | `login_req`, `session`                      | Ei palauta (Tallentaa tulokset tietokantaan) |
-| `wilma_signin`               | Kirjautuu Wilmaan ja palauttaa kirjautumisen vastauksen sekä session. | Ei parametreja                              | `login_req` (HTTP-vastaus), `session` (istunto) |
-| `connect_mongodb`            | Yhdistää MongoDB-tietokantaan ja palauttaa määritellyn kokoelman. | `collection` (kokoelman nimi)               | MongoDB-kokoelma                           |
-| `find_items_mongodb`         | Hakee dokumentit annetusta MongoDB-kokoelmasta. | `collection` (MongoDB-kokoelma), `query` (hakuehto, oletusarvo {}) | MongoDB-dokumenttien kokoelma   |
-| `refactor_events`            | Muotoilee MongoDB:n dokumentit Google Kalenteriin sopiviksi tapahtumiksi. | `events` (MongoDB:n dokumenttien lista)     | Google kalenteriin sopiva muotoiltujen tapahtumien lista            |
-| `google_calendar_token`      | Luo ja palauttaa Google Calendar API:n tokenit. | Ei parametreja                              | Google API:n service-olio              |
-| `show_calendar_events`       | Näyttää tulevat tapahtumat Google Kalenterista. | `calendarID` (kalenterin tunniste, oletusarvo "primary") | Ei palauta (Tulostaa tulevat tapahtumat) |
-| `create_calendar_event`      | Luo uuden tapahtuman Google Kalenteriin. | `event` (kalenteritapahtuman tiedot), `calendarID` (kalenterin tunniste) | Palauttaa luodun tapahtuman tiedot (linkki ja muut tiedot) |
-
+| Funktion nimi             | Kuvaus                                           | Parametrit                                                                                               | Palauttaa                                   |
+|---------------------------|--------------------------------------------------|----------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| `wilma_student`           | Kirjautuu Wilmaan ja hakee oppilaan.             | `login_req` (HTTP-vastaus), `session` (istunto), `wilma_student` (oppilaan nimi, oletusarvo)             | `session`, `oppilas_url`                   |
+| `wilma_subject`           | Hakee oppilaan kouluaineet.                           | `session` (istunto), `oppilas_url` (oppilaan URL)                                                        | Tulostaa aineiden linkit                   |
+| `wilma_homeworks`         | Hakee ja käsittelee kotitehtävät.                | `session` (istunto), `link_url` (aineen URL), `subject_text` (aineen teksti)                             | Tulostaa kotitehtävät                      |
+| `wilma_exams`             | Hakee ja tallentaa kokeiden tiedot.              | `session` (istunto), `oppilas_url` (oppilaan URL)                                                        | Tulostaa kokeiden tiedot                   |
+| `add_unique_item_mongodb` | Lisää dokumentin MongoDB-tietokantaan.           | `subject` (aihe), `description` (kuvaus), `start` (alkamisaika), `stop` (loppumisaika), `created` (luomisaika), `db` (tietokanta) | Tulostaa lisäysstatus                    |
+| `wilma_signin`            | Kirjautuu Wilmaan.                               | -                                                                                                        | `login_req` (HTTP-vastaus), `session` (istunto) |
+| `connect_mongodb`         | Yhdistää MongoDB-tietokantaan.                   | `collection` (MongoDB-kokoelma)                                                                          | Palauttaa MongoDB-kokoelman               |
+| `find_items_mongodb`      | Hakee dokumentit MongoDB-kokoelmasta.            | `collection` (MongoDB-kokoelma), `query` (hakuehto, oletusarvo {})                                       | MongoDB-dokumenttien iteroitava kokoelma  |
+| `refactor_events`         | Muotoilee MongoDB:n dokumentit Google Kalenteriin sopiviksi tapahtumiksi. | `events` (MongoDB:n dokumenttien lista)                                         | Google kalenteriin sopiva muotoiltujen tapahtumien lista             |
+| `google_calendar_token`   | Hakee Google Calendar API:n tokenit.             | -                                                                                                        | Palauttaa Google API:n credentials        |
+| `show_calendar_events`    | Näyttää tapahtumat Google Kalenterista.          | `calendarID` (kalenterin tunniste, oletusarvo "primary")                                                 | Tulostaa tulevat tapahtumat               |
+| `create_calendar_event`   | Luo uuden tapahtuman Google Kalenteriin.         | `event` (kalenteritapahtuman tiedot), `calendarID` (kalenterin tunniste)                                 | Tulostaa luodun tapahtuman linkin         |
 
 
