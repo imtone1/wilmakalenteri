@@ -10,8 +10,6 @@ Sovelluksella pystyy poimimaan Wilmasta kokeet ja kotitehtävät ja lisäämää
 
 Halusin luoda sovelluksen, jolla voisin helposti lisätä Wilman kotitehtävät Google kalenteriin. Tämä helpottaa lasten kotitehtävien seuraamista.
 
-[[_TOC_]]
-
 ## Asennus
 
 Suosittelen luoda virtuaaliympäristön tätä sovellusta varten. Virtuaaliympäristön luominen onnistuu seuraavalla komennolla:
