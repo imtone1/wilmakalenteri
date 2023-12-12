@@ -48,8 +48,6 @@ def wilma_exams(session, oppilas_url):
         soup=bs(oppilaansivu.text, 'html.parser')
         tables = soup.select('#main-content .table')
 
-        # data = []
-
         for table in tables:
             row = table.find_all('tr')
             start = row[0].select_one('td:nth-of-type(1) strong').text
@@ -83,42 +81,15 @@ def wilma_exams(session, oppilas_url):
                 'created': created
                 }
             
-            # data.append(koe)
-            # post_id = kokeet_db.insert_one(koe).inserted_id
-            # post_id
             # Tarkistetaan, onko samanlainen dokumentti jo olemassa
             exists = kokeet_db.find_one({"summary": koe["summary"], "description": koe["description"]})
 
             if not exists:
                 # Jos samanlaista dokumenttia ei löydy, lisätään se kokoelmaan
-                kokeet_db.insert_one(koe)
-                print("Document added")
+                lisatty=kokeet_db.insert_one(koe).inserted_id
+                print(f"Document added {lisatty}")
             else:
                 print("Document already exists")
-
-        #     # Muunnetaan datetime-objektit
-        #     start_iso = start.isoformat() if isinstance(start, datetime) else start
-        #     stop_iso = stop.isoformat() if isinstance(stop, datetime) else stop
-        #     created_iso = created.isoformat() if isinstance(created, datetime) else created
-
-        #     data = []
-        #     koe1 = {
-        #         "summary": subject,
-        #         "description": description,
-        #         'start': {
-        #             'dateTime': start_iso,
-        #             'timeZone': "Europe/Helsinki",
-        #         },
-        #         'end': {
-        #             'dateTime': stop_iso,
-        #             'timeZone': "Europe/Helsinki",
-        #         },
-        #         'created': created_iso
-        #     }
-        #     data.append(koe1)
-        # # JSON-muotoon
-        # json_data = json.dumps(data, indent=4, ensure_ascii=False)
-        # print(json_data)
 
 #kirjautuu wilmaan
 def wilma_signin():
