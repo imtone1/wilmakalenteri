@@ -23,17 +23,10 @@ from googleapiclient.errors import HttpError
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 load_dotenv()
+WILMA_STUDENT = os.environ["WILMA_STUDENT"]
 
-#Wilman kokeiden haku sekä tallennus tietokantaan
-def wilma_exams(login_req, session):
-    wilma_student = os.environ["WILMA_STUDENT"]
-
-    #mongoDB
-    kokeet_db = connect_mongodb("kokeet")
-
-    created = datetime.now(tz=timezone.utc)
-
-
+#Wilmaan kirjautuminen ja oppilaan hakeminen
+def wilma_student(login_req, session, wilma_student=WILMA_STUDENT):
     soup = bs(login_req.text, 'html.parser')
     # print(soup)
     # Etsitään linkki, joka sisältää oppilaan nimen
@@ -41,6 +34,15 @@ def wilma_exams(login_req, session):
     if oppilas_link:
         # Linkki
         oppilas_url = oppilas_link['href']
+        return session, oppilas_url
+    else:
+        print("There is no such student.")
+
+#Wilman kokeiden haku sekä tallennus tietokantaan
+def wilma_exams(session, oppilas_url):
+        #mongoDB
+        kokeet_db = connect_mongodb("kokeet")
+        created = datetime.now(tz=timezone.utc)
         # Siirrytään oppilaan sivulle
         oppilaansivu=session.get(os.environ["WILMA_URL"] + oppilas_url+"/exams/calendar")
         soup=bs(oppilaansivu.text, 'html.parser')
@@ -117,9 +119,6 @@ def wilma_exams(login_req, session):
         # # JSON-muotoon
         # json_data = json.dumps(data, indent=4, ensure_ascii=False)
         # print(json_data)
-
-    else:
-        print("There is no such student.")
 
 #kirjautuu wilmaan
 def wilma_signin():
@@ -253,16 +252,16 @@ def create_calendar_event(event, calendarID):
   print(f"Event created: {event.get('htmlLink')}")
 
 def main():
-    wilma_exams(*wilma_signin())
+    wilma_exams(*wilma_student(*wilma_signin()))
 
-    one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
-    query = {"created": {"$gte": one_minute_ago}}
+    # one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
+    # query = {"created": {"$gte": one_minute_ago}}
     
-    # show_calendar_events(calendarID)
-    events=find_items_mongodb(connect_mongodb("kokeet"), query)
-    refaktoroitu=refactor_events(events)
-    for doc in refaktoroitu:
-        create_calendar_event(doc, calendarID)
+    # # show_calendar_events(calendarID)
+    # events=find_items_mongodb(connect_mongodb("kokeet"), query)
+    # refaktoroitu=refactor_events(events)
+    # for doc in refaktoroitu:
+    #     create_calendar_event(doc, calendarID)
 
 if __name__ == "__main__":
   main()
