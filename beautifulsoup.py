@@ -226,6 +226,16 @@ def refactor_events(events):
         events_list.append(event)
     return events_list
 
+#Muotoillaan tehtävä Habiticaan sopivaksi
+def refactor_to_habitica_tasks(text, notes):
+    task= {
+      "type": "todo",
+      "text": text,
+      "notes": notes,
+      "priority": "0.1"
+    }
+    return task
+
 #Kirjautuminen Googlen kalenteriin
 def google_calendar_token():
     """Tokens Google API

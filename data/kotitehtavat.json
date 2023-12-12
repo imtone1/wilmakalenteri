@@ -4,24 +4,22 @@
       "text": "Täytä astianpesukoneen",
       "notes": "Astioiden esipesu ja astiankoneen täyttäminen",
       "frequency": "daily",
-      "priority": "1",
-      "difficulty": "1"
+      "priority": "1"
     },
     {
       "type": "daily",
       "text": "Pura astiat astianpesukoneesta",
       "notes": "Tyhjennä astianpesukone pestyistä astioista",
       "frequency": "daily",
-      "priority": "1",
-      "difficulty": "1"
+      "priority": "1"
     },
     {
       "type": "daily",
       "text": "Pyyhi työtasot",
       "notes": "Puhdista keittiön työtasot",
       "frequency": "daily",
-      "priority": "1",
-      "difficulty": "1"
+      "priority": "1"
+      
     },
     {
       "type": "daily",
@@ -133,7 +131,6 @@
       "text": "Järjestä ja puhdista ulkovarasto",
       "notes": "Siivoa ja järjestele ulkovarasto",
       "frequency": "yearly",
-      "priority": "2",
-      "difficulty": "2"
+      "priority": "2"
     }
   ]

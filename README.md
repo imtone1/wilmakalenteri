@@ -102,5 +102,5 @@ Lisäksi tarvitsemme session cookien. Nämä löytyvät "Cookies" välilehdeltä
 | `create_habitica_task`     | Lisää yhden tehtävän Habiticaan.                | `challenge_id` (Habitican haasteen tunnus), `task_data` (tehtävän tiedot)                           | Vastausobjekti tehtävän luomisen jälkeen  |
 | `create_all_habitica_tasks`| Lisää useita tehtäviä Habiticaan.               | `challenge_id` (Habitican haasteen tunnus), `tasks` (tehtävien lista)                               | Lista vastausobjekteista ja niiden tiloista |
 | `load_from_json`           | Lataa tehtäviä JSON-tiedostosta.                | `filename` (JSON-tiedoston polku)                                                                    | Lataa ja palauttaa tehtävät tiedostosta   |
-
+| `refactor_to_habitica_tasks` | Muotoillaan tehtävä Habiticaan sopivaksi.    | `text` (tehtävän teksti), `notes` (tehtävän muistiinpanot) | Palauttaa muotoillun tehtävän Habiticaa varten |
 
