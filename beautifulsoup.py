@@ -78,9 +78,9 @@ def wilma_exams(login_req, session):
             if not exists:
                 # Jos samanlaista dokumenttia ei löydy, lisätään se kokoelmaan
                 kokeet_db.insert_one(koe)
-                print("Dokumentti lisätty")
+                print("Document added")
             else:
-                print("Dokumentti on jo olemassa")
+                print("Document already exists")
 
         #     # Muunnetaan datetime-objektit
         #     start_iso = start.isoformat() if isinstance(start, datetime) else start
@@ -133,9 +133,27 @@ def wilma_signin():
 
     return login_req, session
 
+def connect_mongodb(collection):
+    #mongoDB
+    atlas_uri = os.environ["ATLAS_URI"]
+    client = MongoClient(atlas_uri)
+    db = client["wilma"]
+    kokeet_db = db[collection]
+    return kokeet_db
+
+def get_items_mongodb(collection, query={}):
+
+    documents = collection.find(query)
+    print(f"Result for your query {query} is: ")
+    for doc in documents:
+        print(doc)
 
 def main():
-    wilma_exams(wilma_signin()[0], wilma_signin()[1])
+    # wilma_exams(wilma_signin()[0], wilma_signin()[1])
+    one_minute_ago = datetime.now() - timedelta(hours=10, minutes=1)
+    query = {"created": {"$gte": one_minute_ago}}
+
+    get_items_mongodb(connect_mongodb("kokeet"), query)
 
 if __name__ == "__main__":
   main()
