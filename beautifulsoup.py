@@ -10,13 +10,9 @@ from datetime import datetime, timedelta, timezone
 
 from pymongo import MongoClient
 
-
 load_dotenv()
 
-def test_kirjaudu():
-    login_url = os.environ["WILMA_URL"]
-    login = os.environ["WILMA_LOGIN"]
-    password = os.environ["WILMA_PASSWORD"]
+def wilma_exams(login_req, session):
     wilma_student = os.environ["WILMA_STUDENT"]
 
     #mongoDB
@@ -27,23 +23,6 @@ def test_kirjaudu():
     created = datetime.now(tz=timezone.utc)
 
 
-    URL = login_url
-    LOGIN_ROUTE = '/login'
-    HEADERS = {'origin': URL, 'referer': URL + LOGIN_ROUTE}
-    #jos ei toimi, käytä tätä
-    # HEADERS = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36', 'origin': URL, 'referer': URL + LOGIN_ROUTE}
-    s = requests.session()
-    cookie_token = s.get(URL).cookies['Wilma2LoginID']
-    login_payload = {
-            'Login': login,
-            'Password': password, 
-            'SESSIONID': cookie_token
-            }
-    login_req = s.post(URL + LOGIN_ROUTE, headers=HEADERS, data=login_payload)
-    #jos statuskoodi on 200, niin kirjautuminen onnistui
-    print(login_req.status_code)
-    #tallennetaan varmuuden vuoksi
-    cookies = login_req.cookies
     soup = bs(login_req.text, 'html.parser')
     # print(soup)
     # Etsitään linkki, joka sisältää oppilaan nimen
@@ -52,11 +31,11 @@ def test_kirjaudu():
         # Linkki
         oppilas_url = oppilas_link['href']
         # Siirrytään oppilaan sivulle
-        oppilaansivu=s.get(os.environ["WILMA_URL"] + oppilas_url+"/exams/calendar")
+        oppilaansivu=session.get(os.environ["WILMA_URL"] + oppilas_url+"/exams/calendar")
         soup=bs(oppilaansivu.text, 'html.parser')
         tables = soup.select('#main-content .table')
 
-        data = []
+        # data = []
 
         for table in tables:
             row = table.find_all('tr')
@@ -130,5 +109,33 @@ def test_kirjaudu():
     else:
         print("Oppilasta ei löytynyt")
 
-test_kirjaudu()
+def wilma_signin():
+    login_url = os.environ["WILMA_URL"]
+    login = os.environ["WILMA_LOGIN"]
+    password = os.environ["WILMA_PASSWORD"]
+    URL = login_url
+    LOGIN_ROUTE = '/login'
+    HEADERS = {'origin': URL, 'referer': URL + LOGIN_ROUTE}
+    #jos ei toimi, käytä tätä
+    # HEADERS = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36', 'origin': URL, 'referer': URL + LOGIN_ROUTE}
+    session = requests.session()
+    cookie_token = session.get(URL).cookies['Wilma2LoginID']
+    login_payload = {
+            'Login': login,
+            'Password': password, 
+            'SESSIONID': cookie_token
+            }
+    login_req = session.post(URL + LOGIN_ROUTE, headers=HEADERS, data=login_payload)
+    #jos statuskoodi on 200, niin kirjautuminen onnistui
+    print(login_req.status_code)
+    #tallennetaan varmuuden vuoksi
+    cookies = login_req.cookies
 
+    return login_req, session
+
+
+def main():
+    wilma_exams(wilma_signin()[0], wilma_signin()[1])
+
+if __name__ == "__main__":
+  main()
