@@ -19,6 +19,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+import time
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
@@ -81,6 +83,7 @@ def wilma_homeworks(session, link_url, subject_text):
     # onko tällä tbody
     if target_table and target_table.find("tbody"):
         rows = target_table.find("tbody").find_all("tr")
+        count=0
         for row in rows:
             # jokaiselta riviltä haetaan solut
             cells = row.find_all("td")
@@ -98,6 +101,15 @@ def wilma_homeworks(session, link_url, subject_text):
                 stop = yksitunti.isoformat()
                 subject=subject_text
                 add_unique_item_mongodb(subject, description, start, stop, created, db)
+                task_data=refactor_to_habitica_tasks(subject, description)
+                count=count+1
+                if count>10:
+                    #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
+                    print("Waiting 30 seconds...")
+                    count=0
+                    time.sleep(30)
+                create_habitica_task(task_data)
+
     else:
         print("Table with 'Kotitehtävät' not found or no tbody.")
 
@@ -189,9 +201,9 @@ def connect_mongodb(collection):
     atlas_uri = os.environ["ATLAS_URI"]
     client = MongoClient(atlas_uri)
     db = client["wilma"]
-    kokeet_db = db[collection]
+    collection_db = db[collection]
 
-    return kokeet_db
+    return collection_db
 
 #löytää dokumentit tietokannasta
 def find_items_mongodb(collection, query={}):
@@ -301,7 +313,7 @@ def create_calendar_event(event, calendarID):
   print(f"Event created: {event.get('htmlLink')}")
 
 # Yhden tehtävän lisäämiseen
-def create_habitica_task(challenge_id, task_data):
+def create_habitica_task(task_data, challenge_id=os.environ["HABITICA_CHALLENGE1"] ):
     try:
         habitica_api_user = os.environ["HABITICA_API_USER"]
         habitica_api_key = os.environ["HABITICA_API_KEY"]
@@ -325,12 +337,12 @@ def create_habitica_task(challenge_id, task_data):
         raise
 
 # Useamman tehtävän lisäämiseen
-def create_all_habitica_tasks(challenge_id, tasks):
+def create_all_habitica_tasks(tasks, challenge_id=os.environ["HABITICA_CHALLENGE1"]):
     results = []
 
     for task in tasks:
         try:
-            response = create_habitica_task(challenge_id, task)
+            response = create_habitica_task( task, challenge_id)
             #json muodossa, jos jälkikäteen käytetään johonkin
             results.append({'success': True, 'response': response, 'data': task })
         except Exception as error:
@@ -359,7 +371,7 @@ def main():
     
     tasks=load_from_json('data\kotitehtavat.json')
     habitica_challenge= os.environ["HABITICA_CHALLENGE1"]
-    results = create_all_habitica_tasks(habitica_challenge, tasks)
+    results = create_all_habitica_tasks( tasks, habitica_challenge)
     print(results)
 
 if __name__ == "__main__":
