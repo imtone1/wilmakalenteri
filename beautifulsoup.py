@@ -38,7 +38,7 @@ def wilma_student(login_req, session, wilma_student=WILMA_STUDENT):
     else:
         print("There is no such student.")
 
-def wilma_homework(session, oppilas_url):
+def wilma_subject(session, oppilas_url):
     # Siirrytään oppilaan sivulle
     oppilaansivu=session.get(os.environ["WILMA_URL"] + oppilas_url)
     #mongoDB
@@ -55,10 +55,14 @@ def wilma_homework(session, oppilas_url):
             link_element = row.select_one('td:nth-of-type(1) a')
             if link_element:
                 link_url = link_element.get('href')
-                links.append(link_url)
-    print(links)
+                link_text = link_element.get_text(separator=' ', strip=True)
+                links.append(link_text)
+                wilma_homeworks(session, link_url)
+    print(f"Links: {links}")
+
+def wilma_homeworks(session, link_url):
     # Siirrytään aineen sivulle
-    kotitehtavasivu=session.get(os.environ["WILMA_URL"] + "/!0434277/groups/180773")
+    kotitehtavasivu=session.get(os.environ["WILMA_URL"] + link_url)
     
     soup=bs(kotitehtavasivu.content, 'html.parser')
     
@@ -112,30 +116,34 @@ def wilma_exams(session, oppilas_url):
             # Luodaan loppuaika, joka on yksi tunti alkamisen jälkeen
             yksitunti = start_aamu + timedelta(hours=1)
             stop = yksitunti.isoformat()
-                
-            koe = {
-                "summary": subject,
-                "description": description,
-                'start': {
-                    'dateTime': start,
-                    'timeZone': "Europe/Helsinki",
-                },
-                'end': {
-                    'dateTime': stop,
-                    'timeZone': "Europe/Helsinki",
-                },
-                'created': created
-                }
-            
-            # Tarkistetaan, onko samanlainen dokumentti jo olemassa
-            exists = kokeet_db.find_one({"summary": koe["summary"], "description": koe["description"]})
 
-            if not exists:
-                # Jos samanlaista dokumenttia ei löydy, lisätään se kokoelmaan
-                lisatty=kokeet_db.insert_one(koe).inserted_id
-                print(f"Document added {lisatty}")
-            else:
-                print("Document already exists")
+            add_unique_item_mongodb(subject, description, start, stop, created, kokeet_db)
+           
+def add_unique_item_mongodb(subject, description, start, stop, created, db):
+    doc = {
+        "summary": subject,
+        "description": description,
+        'start': {
+            'dateTime': start,
+            'timeZone': "Europe/Helsinki",
+        },
+        'end': {
+            'dateTime': stop,
+            'timeZone': "Europe/Helsinki",
+        },
+        'created': created
+        }
+    
+    # Tarkistetaan, onko samanlainen dokumentti jo olemassa
+    exists = db.find_one({"summary": doc["summary"], "description": doc["description"]})
+
+    if not exists:
+        # Jos samanlaista dokumenttia ei löydy, lisätään se kokoelmaan
+        lisatty=db.insert_one(doc).inserted_id
+        print(f"Document added {lisatty}")
+    else:
+        print("Document already exists")
+
 
 #kirjautuu wilmaan
 def wilma_signin():
@@ -269,17 +277,17 @@ def create_calendar_event(event, calendarID):
   print(f"Event created: {event.get('htmlLink')}")
 
 def main():
-    #wilma_exams(*wilma_student(*wilma_signin()))
-    wilma_homework(*wilma_student(*wilma_signin()))
+    wilma_exams(*wilma_student(*wilma_signin()))
+    wilma_subject(*wilma_student(*wilma_signin()))
 
-    # one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
-    # query = {"created": {"$gte": one_minute_ago}}
+    one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
+    query = {"created": {"$gte": one_minute_ago}}
     
-    # # show_calendar_events(calendarID)
-    # events=find_items_mongodb(connect_mongodb("kokeet"), query)
-    # refaktoroitu=refactor_events(events)
-    # for doc in refaktoroitu:
-    #     create_calendar_event(doc, calendarID)
+    # show_calendar_events(calendarID)
+    events=find_items_mongodb(connect_mongodb("kokeet"), query)
+    refaktoroitu=refactor_events(events)
+    for doc in refaktoroitu:
+        create_calendar_event(doc, calendarID)
 
 if __name__ == "__main__":
   main()
