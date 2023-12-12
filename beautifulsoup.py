@@ -41,9 +41,6 @@ def wilma_student(login_req, session, wilma_student=WILMA_STUDENT):
 def wilma_subject(session, oppilas_url):
     # Siirrytään oppilaan sivulle
     oppilaansivu=session.get(os.environ["WILMA_URL"] + oppilas_url)
-    #mongoDB
-    kokeet_db = connect_mongodb("kotitehtavat")
-    created = datetime.now(tz=timezone.utc)
 
     soup=bs(oppilaansivu.text, 'html.parser')
     tables = soup.select('#main-content .table', {"class": "table index-table"})

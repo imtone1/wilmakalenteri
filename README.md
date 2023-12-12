@@ -1,18 +1,16 @@
-<!-- Write documentation on how to Create .venv environment in python -->
-<!-- Write documentation on how to install dependencies -->
-<!-- Write documentation on how to run the project -->
-
-# 
-
 # Wilma kalenteriin
 
 ## Kuvaus
 
 Wilma kalenteriin on python sovellus, joka hakee Wilmasta kotitehtävät ja lisää ne käyttäjän valitsemaan Google kalenteriin.
 
+Sovelluksella pystyy poimimaan Wilmasta kokeet ja kotitehtävät ja lisäämään ne Google kalenteriin. Sovellus osaa myös lisätä tehtävät Habiticaan.
+
 ### Tausta 
 
-Halusin luoda sovelluksen, jolla voisin helposti lisätä Wilman kotitehtävät Google kalenteriin. Tämä helpottaa lasten kotitehtävien seuraamista. 
+Halusin luoda sovelluksen, jolla voisin helposti lisätä Wilman kotitehtävät Google kalenteriin. Tämä helpottaa lasten kotitehtävien seuraamista.
+
+[[_TOC_]]
 
 ## Asennus
 
@@ -64,7 +62,7 @@ Tietokantana on SQLite3. Lisätietoa SQLite3:sta löytyy [täältä](https://doc
 
 ## Käyttö
 
-Muuta tiedostossa configfile.py olevat muuttujat haluamiksesi ja nimeä tiedosto config.py tiedostoksi.
+Muuta tiedostossa env olevat muuttujat haluamiksesi ja nimeä tiedosto .env-tiedostoksi.
 
 ## BeautifulSoup
 
