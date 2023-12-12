@@ -66,3 +66,45 @@ Tietokantana on SQLite3. Lisätietoa SQLite3:sta löytyy [täältä](https://doc
 
 Muuta tiedostossa configfile.py olevat muuttujat haluamiksesi ja nimeä tiedosto config.py tiedostoksi.
 
+## BeautifulSoup
+
+Tiedosto beautifulsoup.py käyttää BeautifulSoup kirjastoa Wilman sivujen parsimiseen. Lisätietoa BeautifulSoupista löytyy [täältä](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+
+Sen käyttö saattaa vaatia Wilma sivuston tarkempaa tutkimista.
+
+## Kehittäjätyökalut (Developer Tools)
+
+Navigoi Wilma sivustolle ja avaa kehittäjätyökalut joko painamalla F12 tai oikealla hiiren näppäimellä ja valitse "Inspect". 
+
+Navigoi kehittäjätyökaluissa "Network" välilehdelle. Täppää "Preserve log" ja yritä kirjautua (pelkkä "Kirjaudu sisään" ilman tunnuksia riittää).
+
+Nyt kehittäjätyökaluissa pitäisi näkyä login POST pyyntö. Etsi login pyyntö. Headers välilehdeltä löytyy tarvitsemanne payload tiedot. Nämä ovat otsikomme.
+
+![Headers](./data/kuvat/network_tab.JPG)
+
+Lisäksi tarvitsemme session cookien. Nämä löytyvät "Cookies" välilehdeltä tai samalta paikasta, josta löysimme payload tiedot "Headers" välilehdeltä. Tarkista Set-Cookie cookien nimi.
+
+![Cookies](./data/kuvat/setcookie.JPG)
+
+
+## Funktiot
+
+| Funktion nimi             | Kuvaus                                           | Parametrit                                                                                               | Palauttaa                                   |
+|---------------------------|--------------------------------------------------|----------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| `wilma_student`           | Kirjautuu Wilmaan ja hakee oppilaan.             | `login_req` (HTTP-vastaus), `session` (istunto), `wilma_student` (oppilaan nimi, oletusarvo)             | `session`, `oppilas_url`                   |
+| `wilma_subject`           | Hakee oppilaan kouluaineet.                      | `session` (istunto), `oppilas_url` (oppilaan URL)                                                        | Tulostaa aineiden linkit                   |
+| `wilma_homeworks`         | Hakee ja käsittelee kotitehtävät.                | `session` (istunto), `link_url` (aineen URL), `subject_text` (aineen teksti)                             | Tulostaa kotitehtävät                      |
+| `wilma_exams`             | Hakee ja tallentaa kokeiden tiedot.              | `session` (istunto), `oppilas_url` (oppilaan URL)                                                        | Tulostaa kokeiden tiedot                   |
+| `add_unique_item_mongodb` | Lisää dokumentin MongoDB-tietokantaan.           | `subject` (aihe), `description` (kuvaus), `start` (alkamisaika), `stop` (loppumisaika), `created` (luomisaika), `db` (tietokanta) | Tulostaa lisäysstatus                    |
+| `wilma_signin`            | Kirjautuu Wilmaan.                               | -                                                                                                        | `login_req` (HTTP-vastaus), `session` (istunto) |
+| `connect_mongodb`         | Yhdistää MongoDB-tietokantaan.                   | `collection` (MongoDB-kokoelma)                                                                          | Palauttaa MongoDB-kokoelman               |
+| `find_items_mongodb`      | Hakee dokumentit MongoDB-kokoelmasta.            | `collection` (MongoDB-kokoelma), `query` (hakuehto, oletusarvo {})                                       | MongoDB-dokumenttien iteroitava kokoelma  |
+| `refactor_events`         | Muotoilee MongoDB:n dokumentit Google Kalenteriin sopiviksi tapahtumiksi. | `events` (MongoDB:n dokumenttien lista)                                         | Google kalenteriin sopiva muotoiltujen tapahtumien lista             |
+| `google_calendar_token`   | Hakee Google Calendar API:n tokenit.             | -                                                                                                        | Palauttaa Google API:n credentials        |
+| `show_calendar_events`    | Näyttää tapahtumat Google Kalenterista.          | `calendarID` (kalenterin tunniste, oletusarvo "primary")                                                 | Tulostaa tulevat tapahtumat               |
+| `create_calendar_event`   | Luo uuden tapahtuman Google Kalenteriin.         | `event` (kalenteritapahtuman tiedot), `calendarID` (kalenterin tunniste)                                 | Tulostaa luodun tapahtuman linkin         |
+| `create_habitica_task`     | Lisää yhden tehtävän Habiticaan.                | `challenge_id` (Habitican haasteen tunnus), `task_data` (tehtävän tiedot)                           | Vastausobjekti tehtävän luomisen jälkeen  |
+| `create_all_habitica_tasks`| Lisää useita tehtäviä Habiticaan.               | `challenge_id` (Habitican haasteen tunnus), `tasks` (tehtävien lista)                               | Lista vastausobjekteista ja niiden tiloista |
+| `load_from_json`           | Lataa tehtäviä JSON-tiedostosta.                | `filename` (JSON-tiedoston polku)                                                                    | Lataa ja palauttaa tehtävät tiedostosta   |
+
+
