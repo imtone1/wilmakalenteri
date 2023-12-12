@@ -6,3 +6,8 @@ WILMA_URL=wilman soite yleensä .inschool.fi loppuinen
 WILMA_LOGIN=kayttajatunnus
 WILMA_PASSWORD=salasana
 WILMA_STUDENT=oppilaan nimi
+
+HABITICA_API_USER=habitica
+HABITICA_API_KEY=habitica api key
+HABITICA_CLIENT=habitica client
+HABITICA_CHALLENGE1=habitica challenge id löytyy challenge url:stä
