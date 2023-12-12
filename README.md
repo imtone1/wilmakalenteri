@@ -87,5 +87,18 @@ Lisäksi tarvitsemme session cookien. Nämä löytyvät "Cookies" välilehdeltä
 ![Cookies](./data/kuvat/setcookie.JPG)
 
 
+## Funktiot
+
+| Funktio                      | Kuvaus                                  | Parametrit                                  | Palauttaa                                  |
+|------------------------------|-----------------------------------------|---------------------------------------------|--------------------------------------------|
+| `wilma_exams`                | Hakee Wilman kokeet ja tallentaa ne tietokantaan. | `login_req`, `session`                      | Ei palauta (Tallentaa tulokset tietokantaan) |
+| `wilma_signin`               | Kirjautuu Wilmaan ja palauttaa kirjautumisen vastauksen sekä session. | Ei parametreja                              | `login_req` (HTTP-vastaus), `session` (istunto) |
+| `connect_mongodb`            | Yhdistää MongoDB-tietokantaan ja palauttaa määritellyn kokoelman. | `collection` (kokoelman nimi)               | MongoDB-kokoelma                           |
+| `find_items_mongodb`         | Hakee dokumentit annetusta MongoDB-kokoelmasta. | `collection` (MongoDB-kokoelma), `query` (hakuehto, oletusarvo {}) | MongoDB-dokumenttien kokoelma   |
+| `refactor_events`            | Muotoilee MongoDB:n dokumentit Google Kalenteriin sopiviksi tapahtumiksi. | `events` (MongoDB:n dokumenttien lista)     | Google kalenteriin sopiva muotoiltujen tapahtumien lista            |
+| `google_calendar_token`      | Luo ja palauttaa Google Calendar API:n tokenit. | Ei parametreja                              | Google API:n service-olio              |
+| `show_calendar_events`       | Näyttää tulevat tapahtumat Google Kalenterista. | `calendarID` (kalenterin tunniste, oletusarvo "primary") | Ei palauta (Tulostaa tulevat tapahtumat) |
+| `create_calendar_event`      | Luo uuden tapahtuman Google Kalenteriin. | `event` (kalenteritapahtuman tiedot), `calendarID` (kalenterin tunniste) | Palauttaa luodun tapahtuman tiedot (linkki ja muut tiedot) |
+
 
 

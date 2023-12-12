@@ -24,6 +24,7 @@ SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 load_dotenv()
 
+#Wilman kokeiden haku sekä tallennus tietokantaan
 def wilma_exams(login_req, session):
     wilma_student = os.environ["WILMA_STUDENT"]
 
@@ -57,12 +58,13 @@ def wilma_exams(login_req, session):
             # Valitaan splitatusta arvot
             # print(subject_list)
             subject = subject_list[0].strip() + subject_list[1].strip() + subject_list[2].strip()
+            #ensimmäinen arvo on viikonpäivä, joten valitaan toinen
             pvm = start.split(' ')[1]
             start_obj = datetime.strptime(pvm, "%d.%m.%Y")
             start_aamu = start_obj + timedelta(hours=6)
             start = start_aamu.isoformat()
             # Luodaan loppuaika, joka on yksi tunti alkamisen jälkeen
-            yksitunti = start_obj + timedelta(hours=1)
+            yksitunti = start_aamu + timedelta(hours=1)
             stop = yksitunti.isoformat()
                 
             koe = {
@@ -119,6 +121,7 @@ def wilma_exams(login_req, session):
     else:
         print("There is no such student.")
 
+#kirjautuu wilmaan
 def wilma_signin():
     login_url = os.environ["WILMA_URL"]
     login = os.environ["WILMA_LOGIN"]
@@ -143,20 +146,47 @@ def wilma_signin():
 
     return login_req, session
 
+#yhdistää tietokantaan ja palauttaa kokoelman
 def connect_mongodb(collection):
     #mongoDB
     atlas_uri = os.environ["ATLAS_URI"]
     client = MongoClient(atlas_uri)
     db = client["wilma"]
     kokeet_db = db[collection]
+
     return kokeet_db
 
-def get_items_mongodb(collection, query={}):
+#löytää dokumentit tietokannasta
+def find_items_mongodb(collection, query={}):
 
     documents = collection.find(query)
-    print(f"Result for your query {query} is: ")
-    for doc in documents:
-        print(doc)
+
+    return documents
+
+#palauttaa refaktoroidun listan google kalenteriin vietäväksi
+def refactor_events(events):
+    events_list = []
+
+    for doc in events:
+        #muotoillaan
+        event = {
+            "summary": doc["summary"],
+            "description": doc["description"],
+            "start": {
+                "dateTime": doc["start"]["dateTime"],
+                'timeZone': "Europe/Helsinki"
+            },
+            "end": {
+                "dateTime": doc["end"]["dateTime"],
+                'timeZone': "Europe/Helsinki"
+            }
+        }
+
+        print(event)
+
+        #lisätään listaan
+        events_list.append(event)
+    return events_list
 
 #Kirjautuminen Googlen kalenteriin
 def google_calendar_token():
@@ -216,13 +246,23 @@ def show_calendar_events(calendarID="primary"):
     except HttpError as error:
         print(f"An error occurred in Google Calendar showing event: {error}")
 
-def main():
-    # wilma_exams(*wilma_signin())
-    # one_minute_ago = datetime.now() - timedelta(hours=10, minutes=1)
-    # query = {"created": {"$gte": one_minute_ago}}
+#luo kalenteritapahtuman
+def create_calendar_event(event, calendarID):
+  service = google_calendar_token()
+  event = service.events().insert(calendarId=calendarID, body=event).execute()
+  print(f"Event created: {event.get('htmlLink')}")
 
-    # get_items_mongodb(connect_mongodb("kokeet"), query)
-    show_calendar_events(calendarID)
+def main():
+    wilma_exams(*wilma_signin())
+
+    one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
+    query = {"created": {"$gte": one_minute_ago}}
+    
+    # show_calendar_events(calendarID)
+    events=find_items_mongodb(connect_mongodb("kokeet"), query)
+    refaktoroitu=refactor_events(events)
+    for doc in refaktoroitu:
+        create_calendar_event(doc, calendarID)
 
 if __name__ == "__main__":
   main()
