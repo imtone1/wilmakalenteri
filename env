@@ -6,6 +6,7 @@ WILMA_URL=wilman soite yleensä .inschool.fi loppuinen
 WILMA_LOGIN=kayttajatunnus
 WILMA_PASSWORD=salasana
 WILMA_STUDENT=oppilaan nimi
+WILMA_STUDENTS=Etunimi Sukunimi,Etunimi Sukunimi
 
 #Älä muuta näitä, jos et käytä Habiticaa
 HABITICA_API_USER=habitica

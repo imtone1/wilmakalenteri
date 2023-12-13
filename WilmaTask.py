@@ -366,13 +366,24 @@ def load_from_json(filename):
     return tasks
 
 def main():
-    wilma_exams(*wilma_student(*wilma_signin()))
-    wilma_subject(*wilma_student(*wilma_signin()))
+    
+    WILMA_STUDENTS = os.environ["WILMA_STUDENTS"].split(",")
+    login, session = wilma_signin()
+    for student in WILMA_STUDENTS:
+        print(f"Student: {student}")
+        wilma_exams(*wilma_student(login, session, student))
+        
+        wilma_subject(*wilma_student(login, session, student))
+        print("Gone through all students")
 
+    # Quory, jolla haetaan mongodb:stä, muuten palauttaa kaikki
     one_minute_ago = datetime.now() - timedelta(hours=0, minutes=2)
     query = {"created": {"$gte": one_minute_ago}}
     print(f"Searched from {one_minute_ago}")
+
+
     # # show_calendar_events(calendarID)
+    #haetaan kokeet tietokannasta, muokataan Google kalenteriin sopivaksi ja lisätään kalenteriin
     events=find_items_mongodb(connect_mongodb("kokeet"), query)
     refaktoroitu=refactor_events(events)
     for doc in refaktoroitu:
@@ -383,6 +394,7 @@ def main():
         print("Habitica challenge not set. Set it in .env file if you want to add tasks to Habitica.")
         return
     
+    #Lisätään tehtävät Habiticaan
     # tasks=load_from_json('data\kotitehtavat.json')
     habitica_challenge= os.environ["HABITICA_CHALLENGE1"]
     tasks=find_items_mongodb(connect_mongodb("kotitehtavat"), query)
