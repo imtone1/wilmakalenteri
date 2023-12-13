@@ -98,7 +98,8 @@ def wilma_homeworks(session, link_url, subject_text):
                 stop = yksitunti.isoformat()
                 print(f"Date: {start}, Notes: {description}, Start: {start}")
                 
-                days = datetime.now()- timedelta(days=10)
+                #kuinka monen päivän sisällä tehtävä on
+                days = datetime.now()- timedelta(days=5)
 
                 #tallennetaan vain tulevat tehtävät
                 if start_obj > days:
@@ -365,8 +366,12 @@ def load_from_json(filename):
         tasks = json.load(file)
     return tasks
 
+def delete_from_mongodb(collection, query={}):
+    result = collection.delete_many(query)
+    print(f"Documents deleted: {result.deleted_count}")
+
 def main():
-    
+
     WILMA_STUDENTS = os.environ["WILMA_STUDENTS"].split(",")
     login, session = wilma_signin()
     for student in WILMA_STUDENTS:
@@ -384,11 +389,23 @@ def main():
 
     # # show_calendar_events(calendarID)
     #haetaan kokeet tietokannasta, muokataan Google kalenteriin sopivaksi ja lisätään kalenteriin
-    events=find_items_mongodb(connect_mongodb("kokeet"), query)
-    refaktoroitu=refactor_events(events)
-    for doc in refaktoroitu:
-        create_calendar_event(doc, calendarID)
+    # events=find_items_mongodb(connect_mongodb("kokeet"), query)
+    # refaktoroitu=refactor_events(events)
+    # for doc in refaktoroitu:
+    #     create_calendar_event(doc, calendarID)
     
+    try:
+        #poistetaan vanhat kokeet
+        # 30 päivää vanhemmat
+        thirty_days_ago = datetime.now() - timedelta(days=30)
+
+        query_delete={"created": {"$lt": thirty_days_ago}}
+        delete_from_mongodb(connect_mongodb("kokeet"), query_delete)
+        delete_from_mongodb(connect_mongodb("kotitehtavat"), query_delete)
+
+    except Exception as error:
+        print(f"Error in deleting kokeet or kotitehtävät: {error}")
+
     #ei suoriteta Habiticaa, jos sitä ei ole asetettu
     if (os.environ["HABITICA_CHALLENGE1"] == "0"):
         print("Habitica challenge not set. Set it in .env file if you want to add tasks to Habitica.")
@@ -410,6 +427,21 @@ def main():
         create_habitica_task(task, habitica_challenge)
             
         print(f"Task created: {task.get('text')}")
+
+    #kokeet Habiticaan
+    tasks=find_items_mongodb(connect_mongodb("kokeet"), query)
+    refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
+    count=0
+    for task in refaktoroitu_tasks:    
+        count=count+1
+        if count>10:
+            #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
+            print("Waiting 30 seconds...")
+            count=0
+            time.sleep(30)
+        create_habitica_task(task, habitica_challenge)
+            
+        print(f"Exam created: {task.get('text')}")
 
 if __name__ == "__main__":
   main()
