@@ -6,6 +6,8 @@ Wilma kalenteriin on python sovellus, joka hakee Wilmasta kotitehtävät ja lis�
 
 Sovelluksella pystyy poimimaan Wilmasta kokeet ja kotitehtävät ja lisäämään ne Google kalenteriin. Sovellus osaa myös lisätä tehtävät Habiticaan.
 
+Päätoiminnallisuudet löytyvät **WilmaTask.py** tiedostosta.
+
 ### Tausta 
 
 Halusin luoda sovelluksen, jolla voisin helposti lisätä Wilman kotitehtävät Google kalenteriin. Tämä helpottaa lasten kotitehtävien seuraamista.
@@ -60,6 +62,7 @@ Tietokantana on osassa SQLite3. Lisätietoa SQLite3:sta löytyy [täältä](http
 
 Tietokantana on osassa MongoDB. Lisätietoa miten luoda MongoDB tietokanta [täältä](https://www.mongodb.com/docs/atlas/getting-started/).
 
+Voit testata tietokantayhteyttä ajamalla mongodbconnection.py tiedoston.
 
 
 ## Käyttö
