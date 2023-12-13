@@ -68,7 +68,7 @@ Tiedosto beautifulsoup.py käyttää BeautifulSoup kirjastoa Wilman sivujen pars
 
 Sen käyttö saattaa vaatia Wilma sivuston tarkempaa tutkimista.
 
-## Kehittäjätyökalut (Developer Tools)
+### Kehittäjätyökalut (Developer Tools)
 
 Navigoi Wilma sivustolle ja avaa kehittäjätyökalut joko painamalla F12 tai oikealla hiiren näppäimellä ja valitse "Inspect". 
 
@@ -83,7 +83,7 @@ Lisäksi tarvitsemme session cookien. Nämä löytyvät "Cookies" välilehdeltä
 ![Cookies](./data/kuvat/setcookie.JPG)
 
 
-## Funktiot
+### Funktiot
 
 | Funktion nimi             | Kuvaus                                           | Parametrit                                                                                               | Palauttaa                                   |
 |---------------------------|--------------------------------------------------|----------------------------------------------------------------------------------------------------------|--------------------------------------------|

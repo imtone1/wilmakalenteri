@@ -104,7 +104,7 @@ def wilma_homeworks(session, link_url, subject_text):
                 if start_obj > days:
                     print("Adding to database")
                     # add_unique_item_mongodb(subject_text, description, start, db)
-                    add_unique_eventitem_mongodb(subject_text, description, start, stop, kotitehtava_db)
+                    add_unique_item_mongodb(subject_text, description, start, stop, kotitehtava_db)
                     
     else:
         print("Table with 'Kotitehtävät' not found or no tbody.")
@@ -141,9 +141,9 @@ def wilma_exams(session, oppilas_url):
             now = datetime.now()
             #tallennetaan vain tulevat tehtävät
             if start_obj > now:
-                add_unique_eventitem_mongodb(subject, description, start, stop, kokeet_db)
+                add_unique_item_mongodb(subject, description, start, stop, kokeet_db)
            
-def add_unique_eventitem_mongodb(subject, description, start, stop, db):
+def add_unique_item_mongodb(subject, description, start, stop, db):
     now = datetime.now()
     doc = {
         "summary": subject,
