@@ -332,9 +332,9 @@ def create_habitica_task(task_data, challenge_id=os.environ["HABITICA_CHALLENGE1
             f'https://habitica.com/api/v3/tasks/challenge/{challenge_id}',
             headers={
                 'Content-Type': 'application/json',
-                'x-api-user': habitica_api_user,
+                'x-api-user': habitica_api_user ,
                 'x-api-key': habitica_api_key,
-                'x-client': habitica_client
+                'x-client': habitica_client + ' - ' + ' for personal use'
             },
             # data=json.dumps(task_data)
             json=task_data
@@ -377,6 +377,11 @@ def main():
     refaktoroitu=refactor_events(events)
     for doc in refaktoroitu:
         create_calendar_event(doc, calendarID)
+    
+    #ei suoriteta Habiticaa, jos sitä ei ole asetettu
+    if (os.environ["HABITICA_CHALLENGE1"] == "0"):
+        print("Habitica challenge not set. Set it in .env file if you want to add tasks to Habitica.")
+        return
     
     # tasks=load_from_json('data\kotitehtavat.json')
     habitica_challenge= os.environ["HABITICA_CHALLENGE1"]

@@ -64,15 +64,20 @@ Tietokantana on osassa MongoDB. Lisätietoa miten luoda MongoDB tietokanta [tä�
 
 ## Käyttö
 
-Muuta tiedostossa env olevat muuttujat haluamiksesi ja nimeä tiedosto .env-tiedostoksi.
+Muuta tiedostossa env olevat muuttujat haluamiksesi ja nimeä tiedosto .env-tiedostoksi. Jos et käytä Habiticaa, älä muuta env-tiedoston Habitica-muuttujia.
+
 
 Tarvitset Google kalenterin id:n. Lisätietoa Google kalenterin id:stä löytyy kun menet kalenterin asetuksiin ja kopioit "Kalenterin tunnus" kohdasta kalenterin id:n. 
 
 ![Google kalenterin id](./data/kuvat/Integroi_kalenteri.JPG)
 
+Tarvitset myös Habitica API:n avaimet, jos haluat lisätä tehtävät Habiticaan tämän sovelluksen avulla. Lisätietoa Habitica API:n avaimista löytyy [täältä](https://habitica.fandom.com/wiki/Guidance_for_Comrades).
+
+Habitica API:n dokumentaatio löytyy [täältä](https://habitica.com/apidoc/). Mikäli käytät Habitican API:a, muista lisätä täyttää lomakkeen, jossa kerrot mitä aiot tehdä Habitican API:lla. Lomake löytyy [täältä](https://habitica.fandom.com/wiki/Guidance_for_Comrades#Rules_for_Third-Party_Tools) > Notifying Staff About Your Tool
+
 ## BeautifulSoup
 
-Tiedosto beautifulsoup.py käyttää BeautifulSoup kirjastoa Wilman sivujen parsimiseen. Lisätietoa BeautifulSoupista löytyy [täältä](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+Tiedosto WilmaTask.py käyttää BeautifulSoup kirjastoa Wilman sivujen parsimiseen. Lisätietoa BeautifulSoupista löytyy [täältä](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
 
 Sen käyttö saattaa vaatia Wilma sivuston tarkempaa tutkimista.
 
