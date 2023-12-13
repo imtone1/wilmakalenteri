@@ -101,7 +101,7 @@ def wilma_homeworks(session, link_url, subject_text):
                 stop = yksitunti.isoformat()
                 subject=subject_text
                 add_unique_item_mongodb(subject, description, start, stop, created, db)
-                task_data=refactor_to_habitica_tasks(subject, description)
+                task_data=refactor_to_habitica_tasks(subject, description, start)
                 count=count+1
                 if count>10:
                     #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
@@ -239,12 +239,13 @@ def refactor_events(events):
     return events_list
 
 #Muotoillaan tehtävä Habiticaan sopivaksi
-def refactor_to_habitica_tasks(text, notes):
+def refactor_to_habitica_tasks(text, notes, date):
     task= {
       "type": "todo",
       "text": text,
       "notes": notes,
-      "priority": "0.1"
+      "priority": "0.1",
+      "date": date
     }
     return task
 
@@ -357,7 +358,7 @@ def load_from_json(filename):
     return tasks
 
 def main():
-    wilma_exams(*wilma_student(*wilma_signin()))
+    #wilma_exams(*wilma_student(*wilma_signin()))
     wilma_subject(*wilma_student(*wilma_signin()))
 
     one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
