@@ -62,7 +62,7 @@ def wilma_subject(session, oppilas_url):
 def wilma_homeworks(session, link_url, subject_text):
 
      #mongoDB
-    db = connect_mongodb("kotitehtavat")
+    kotitehtava_db = connect_mongodb("kotitehtavat")
     
     created = datetime.now(tz=timezone.utc)
 
@@ -90,29 +90,22 @@ def wilma_homeworks(session, link_url, subject_text):
             if len(cells) >= 2:
                 start = cells[0].get_text(strip=True)
                 description = cells[1].get_text(strip=True)
-
-                print(f"Date: {start}, Notes: {description}")
-                
                 start_obj = datetime.strptime(start, "%d.%m.%Y")
                 start_aamu = start_obj + timedelta(hours=1)
                 start = start_aamu.isoformat()
                 # Luodaan loppuaika, joka on yksi tunti alkamisen jälkeen
                 yksitunti = start_aamu + timedelta(hours=2)
                 stop = yksitunti.isoformat()
-                subject=subject_text
-                now = datetime.now()
-                #tallennetaan vain tulevat tehtävät
-                if start_obj > now:
-                    add_unique_item_mongodb(subject, description, start, stop, created, db)
-                    task_data=refactor_to_habitica_tasks(subject, description, start)
-                    count=count+1
-                    if count>10:
-                        #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
-                        print("Waiting 30 seconds...")
-                        count=0
-                        time.sleep(30)
-                    create_habitica_task(task_data)
+                print(f"Date: {start}, Notes: {description}, Start: {start}")
+                
+                days = datetime.now()- timedelta(days=10)
 
+                #tallennetaan vain tulevat tehtävät
+                if start_obj > days:
+                    print("Adding to database")
+                    # add_unique_item_mongodb(subject_text, description, start, db)
+                    add_unique_eventitem_mongodb(subject_text, description, start, stop, kotitehtava_db)
+                    
     else:
         print("Table with 'Kotitehtävät' not found or no tbody.")
 
@@ -144,13 +137,14 @@ def wilma_exams(session, oppilas_url):
             # Luodaan loppuaika, joka on yksi tunti alkamisen jälkeen
             yksitunti = start_aamu + timedelta(hours=1)
             stop = yksitunti.isoformat()
-
+            
             now = datetime.now()
             #tallennetaan vain tulevat tehtävät
             if start_obj > now:
-                add_unique_item_mongodb(subject, description, start, stop, created, kokeet_db)
+                add_unique_eventitem_mongodb(subject, description, start, stop, kokeet_db)
            
-def add_unique_item_mongodb(subject, description, start, stop, created, db):
+def add_unique_eventitem_mongodb(subject, description, start, stop, db):
+    now = datetime.now()
     doc = {
         "summary": subject,
         "description": description,
@@ -162,7 +156,7 @@ def add_unique_item_mongodb(subject, description, start, stop, created, db):
             'dateTime': stop,
             'timeZone': "Europe/Helsinki",
         },
-        'created': created
+        'created': now
         }
     
     # Tarkistetaan, onko samanlainen dokumentti jo olemassa
@@ -174,7 +168,6 @@ def add_unique_item_mongodb(subject, description, start, stop, created, db):
         print(f"Document added {lisatty}")
     else:
         print("Document already exists")
-
 
 #kirjautuu wilmaan
 def wilma_signin():
@@ -245,15 +238,24 @@ def refactor_events(events):
     return events_list
 
 #Muotoillaan tehtävä Habiticaan sopivaksi
-def refactor_to_habitica_tasks(text, notes, date):
-    task= {
-      "type": "todo",
-      "text": text,
-      "notes": notes,
-      "priority": "0.1",
-      "date": date
-    }
-    return task
+def refactor_to_habitica_tasks(tasks):
+    tasks_list = []
+    for doc in tasks:
+        #muotoillaan
+        task = {
+            "type": "todo",
+            "text": doc["summary"],
+            "notes": doc["description"],
+            "priority": "0.1",
+            "date": doc["start"]["dateTime"]
+        }
+
+        print(f"Task: {task}")
+
+        #lisätään listaan
+        tasks_list.append(task)
+
+    return tasks_list
 
 #Kirjautuminen Googlen kalenteriin
 def google_calendar_token():
@@ -364,25 +366,33 @@ def load_from_json(filename):
     return tasks
 
 def main():
-    #wilma_exams(*wilma_student(*wilma_signin()))
+    wilma_exams(*wilma_student(*wilma_signin()))
     wilma_subject(*wilma_student(*wilma_signin()))
 
-    # one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
-    # query = {"created": {"$gte": one_minute_ago}}
-
-    now = datetime.now()
-    query = {"start": {"$gte": now}}
-    
-    # show_calendar_events(calendarID)
+    one_minute_ago = datetime.now() - timedelta(hours=0, minutes=2)
+    query = {"created": {"$gte": one_minute_ago}}
+    print(f"Searched from {one_minute_ago}")
+    # # show_calendar_events(calendarID)
     events=find_items_mongodb(connect_mongodb("kokeet"), query)
     refaktoroitu=refactor_events(events)
     for doc in refaktoroitu:
         create_calendar_event(doc, calendarID)
     
-    tasks=load_from_json('data\kotitehtavat.json')
+    # tasks=load_from_json('data\kotitehtavat.json')
     habitica_challenge= os.environ["HABITICA_CHALLENGE1"]
-    results = create_all_habitica_tasks( tasks, habitica_challenge)
-    print(results)
+    tasks=find_items_mongodb(connect_mongodb("kotitehtavat"), query)
+    refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
+    count=0
+    for task in refaktoroitu_tasks:    
+        count=count+1
+        if count>10:
+            #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
+            print("Waiting 30 seconds...")
+            count=0
+            time.sleep(30)
+        create_habitica_task(task, habitica_challenge)
+            
+        print(f"Task created: {task.get('text')}")
 
 if __name__ == "__main__":
   main()
