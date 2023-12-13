@@ -100,15 +100,18 @@ def wilma_homeworks(session, link_url, subject_text):
                 yksitunti = start_aamu + timedelta(hours=2)
                 stop = yksitunti.isoformat()
                 subject=subject_text
-                add_unique_item_mongodb(subject, description, start, stop, created, db)
-                task_data=refactor_to_habitica_tasks(subject, description, start)
-                count=count+1
-                if count>10:
-                    #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
-                    print("Waiting 30 seconds...")
-                    count=0
-                    time.sleep(30)
-                create_habitica_task(task_data)
+                now = datetime.now()
+                #tallennetaan vain tulevat tehtävät
+                if start_obj > now:
+                    add_unique_item_mongodb(subject, description, start, stop, created, db)
+                    task_data=refactor_to_habitica_tasks(subject, description, start)
+                    count=count+1
+                    if count>10:
+                        #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
+                        print("Waiting 30 seconds...")
+                        count=0
+                        time.sleep(30)
+                    create_habitica_task(task_data)
 
     else:
         print("Table with 'Kotitehtävät' not found or no tbody.")
@@ -142,7 +145,10 @@ def wilma_exams(session, oppilas_url):
             yksitunti = start_aamu + timedelta(hours=1)
             stop = yksitunti.isoformat()
 
-            add_unique_item_mongodb(subject, description, start, stop, created, kokeet_db)
+            now = datetime.now()
+            #tallennetaan vain tulevat tehtävät
+            if start_obj > now:
+                add_unique_item_mongodb(subject, description, start, stop, created, kokeet_db)
            
 def add_unique_item_mongodb(subject, description, start, stop, created, db):
     doc = {
@@ -361,8 +367,11 @@ def main():
     #wilma_exams(*wilma_student(*wilma_signin()))
     wilma_subject(*wilma_student(*wilma_signin()))
 
-    one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
-    query = {"created": {"$gte": one_minute_ago}}
+    # one_minute_ago = datetime.now() - timedelta(hours=30, minutes=1)
+    # query = {"created": {"$gte": one_minute_ago}}
+
+    now = datetime.now()
+    query = {"start": {"$gte": now}}
     
     # show_calendar_events(calendarID)
     events=find_items_mongodb(connect_mongodb("kokeet"), query)
