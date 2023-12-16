@@ -50,19 +50,11 @@ Asenna tarvittavat kirjastot komennolla
 pip install -r requirements.txt
 ```
 
-Asenna lisäksi Playwright selain ajuri komennolla. Lisätietoa Playwrightista löytyy [täältä](https://playwright.dev/python/docs/intro)
-
-```bash
-playwright install
-```
-
 Lisäksi tarvitset tätä sovellusta varten Google Calendar API:n. Tarkat ohjeet löytyvät Googlen omilta sivuilta [Python quickstart](https://developers.google.com/calendar/api/quickstart/python)
-
-Tietokantana on osassa SQLite3. Lisätietoa SQLite3:sta löytyy [täältä](https://docs.python.org/3/library/sqlite3.html).
 
 Tietokantana on osassa MongoDB. Lisätietoa miten luoda MongoDB tietokanta [täältä](https://www.mongodb.com/docs/atlas/getting-started/).
 
-Voit testata tietokantayhteyttä ajamalla mongodbconnection.py tiedoston.
+Voit testata tietokantayhteyden ajamalla mongodbconnection.py tiedoston.
 
 
 ## Käyttö
@@ -82,11 +74,11 @@ Habitica API:n dokumentaatio löytyy [täältä](https://habitica.com/apidoc/). 
 
 Tiedosto WilmaTask.py käyttää BeautifulSoup kirjastoa Wilman sivujen parsimiseen. Lisätietoa BeautifulSoupista löytyy [täältä](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
 
-Sen käyttö saattaa vaatia Wilma sivuston tarkempaa tutkimista.
+Sen käyttö saattaa vaatia Wilma -sivuston tarkempaa tutkimista.
 
 ### Kehittäjätyökalut (Developer Tools)
 
-Navigoi Wilma sivustolle ja avaa kehittäjätyökalut joko painamalla F12 tai oikealla hiiren näppäimellä ja valitse "Inspect". 
+Navigoi Wilma -sivustolle ja avaa kehittäjätyökalut joko painamalla F12 tai oikealla hiiren näppäimellä ja valitse "Inspect". 
 
 Navigoi kehittäjätyökaluissa "Network" välilehdelle. Täppää "Preserve log" ja yritä kirjautua (pelkkä "Kirjaudu sisään" ilman tunnuksia riittää).
 
