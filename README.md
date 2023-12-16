@@ -54,7 +54,7 @@ Lisäksi tarvitset tätä sovellusta varten Google Calendar API:n. Tarkat ohjeet
 
 Tietokantana on osassa MongoDB. Lisätietoa miten luoda MongoDB tietokanta [täältä](https://www.mongodb.com/docs/atlas/getting-started/).
 
-Voit testata tietokantayhteyden ajamalla mongodbconnection.py tiedoston.
+Voit testata tietokantayhteyden ajamalla extra_functions/mongodbconnection.py tiedoston.
 
 
 ## Käyttö
