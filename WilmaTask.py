@@ -99,7 +99,9 @@ def wilma_subject(session, oppilas_url):
             if link_element:
                 link_url = link_element.get('href')
                 link_text = link_element.get_text(separator=' ', strip=True)
-                links.append(link_text)
+                #links append tuple (link_url, link_text)
+                links.append((link_url, link_text))
+                #links.append(link_text)
                 wilma_homeworks(session, link_url, link_text)
     print(f"Links: {links}")
 
