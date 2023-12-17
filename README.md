@@ -63,7 +63,7 @@ Lisätiedot Google kalenterin OAuth skopeista löydät sivustolta: https://devel
 
 Tietokantana on osassa MongoDB. Lisätietoa miten luoda MongoDB tietokanta [täältä](https://www.mongodb.com/docs/atlas/getting-started/).
 
-Voit testata tietokantayhteyden ajamalla extra_functions/mongodbconnection.py tiedoston.
+Voit testata tietokantayhteyden ajamalla Test kansion testeja.
 
 
 ## Käyttö
