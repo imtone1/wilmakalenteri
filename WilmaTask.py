@@ -372,52 +372,50 @@ def delete_from_mongodb(collection, query={}):
 
 def main():
 
-    WILMA_STUDENTS = os.environ["WILMA_STUDENTS"].split(",")
-    login, session = wilma_signin()
-    for student in WILMA_STUDENTS:
-        print(f"Student: {student}")
-        wilma_exams(*wilma_student(login, session, student))
+    # WILMA_STUDENTS = os.environ["WILMA_STUDENTS"].split(",")
+    # login, session = wilma_signin()
+    # for student in WILMA_STUDENTS:
+    #     print(f"Student: {student}")
+    #     wilma_exams(*wilma_student(login, session, student))
         
-        wilma_subject(*wilma_student(login, session, student))
-        print("Gone through all students")
+    #     wilma_subject(*wilma_student(login, session, student))
+    #     print("Gone through all students")
 
-    # Quory, jolla haetaan mongodb:stä, muuten palauttaa kaikki
-    one_minute_ago = datetime.now() - timedelta(hours=0, minutes=2)
-    query = {"created": {"$gte": one_minute_ago}}
-    print(f"Searched from {one_minute_ago}")
+    # # Quory, jolla haetaan mongodb:stä, muuten palauttaa kaikki
+    # one_minute_ago = datetime.now() - timedelta(hours=0, minutes=2)
+    # query = {"created": {"$gte": one_minute_ago}}
+    # print(f"Searched from {one_minute_ago}")
 
 
-    # # show_calendar_events(calendarID)
-    #haetaan kokeet tietokannasta, muokataan Google kalenteriin sopivaksi ja lisätään kalenteriin
-    # events=find_items_mongodb(connect_mongodb("kokeet"), query)
-    # refaktoroitu=refactor_events(events)
-    # for doc in refaktoroitu:
-    #     create_calendar_event(doc, calendarID)
+    # # # show_calendar_events(calendarID)
+    # #haetaan kokeet tietokannasta, muokataan Google kalenteriin sopivaksi ja lisätään kalenteriin
+    # # events=find_items_mongodb(connect_mongodb("kokeet"), query)
+    # # refaktoroitu=refactor_events(events)
+    # # for doc in refaktoroitu:
+    # #     create_calendar_event(doc, calendarID)
     
-    try:
-        #poistetaan vanhat kokeet
-        # 30 päivää vanhemmat
-        thirty_days_ago = datetime.now() - timedelta(days=30)
+    # try:
+    #     #poistetaan vanhat kokeet
+    #     # 30 päivää vanhemmat
+    #     thirty_days_ago = datetime.now() - timedelta(days=30)
 
-        query_delete={"created": {"$lt": thirty_days_ago}}
-        delete_from_mongodb(connect_mongodb("kokeet"), query_delete)
-        delete_from_mongodb(connect_mongodb("kotitehtavat"), query_delete)
+    #     query_delete={"created": {"$lt": thirty_days_ago}}
+    #     delete_from_mongodb(connect_mongodb("kokeet"), query_delete)
+    #     delete_from_mongodb(connect_mongodb("kotitehtavat"), query_delete)
 
-    except Exception as error:
-        print(f"Error in deleting kokeet or kotitehtävät: {error}")
+    # except Exception as error:
+    #     print(f"Error in deleting kokeet or kotitehtävät: {error}")
 
-    #ei suoriteta Habiticaa, jos sitä ei ole asetettu
-    if (os.environ["HABITICA_CHALLENGE1"] == "0"):
-        print("Habitica challenge not set. Set it in .env file if you want to add tasks to Habitica.")
-        return
+    # #ei suoriteta Habiticaa, jos sitä ei ole asetettu
+    # if (os.environ["HABITICA_CHALLENGE1"] == "0"):
+    #     print("Habitica challenge not set. Set it in .env file if you want to add tasks to Habitica.")
+    #     return
     
-    #Lisätään tehtävät Habiticaan
-    # tasks=load_from_json('data\kotitehtavat.json')
+    #Lisätään kotityöt Habiticaan
+    tasks=load_from_json('data\kotityot_lapset.json')
     habitica_challenge= os.environ["HABITICA_CHALLENGE1"]
-    tasks=find_items_mongodb(connect_mongodb("kotitehtavat"), query)
-    refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
     count=0
-    for task in refaktoroitu_tasks:    
+    for task in tasks:    
         count=count+1
         if count>10:
             #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
@@ -428,20 +426,35 @@ def main():
             
         print(f"Task created: {task.get('text')}")
 
-    #kokeet Habiticaan
-    tasks=find_items_mongodb(connect_mongodb("kokeet"), query)
-    refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
-    count=0
-    for task in refaktoroitu_tasks:    
-        count=count+1
-        if count>10:
-            #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
-            print("Waiting 30 seconds...")
-            count=0
-            time.sleep(30)
-        create_habitica_task(task, habitica_challenge)
+    # habitica_challenge= os.environ["HABITICA_CHALLENGE1"]
+    # # tasks=find_items_mongodb(connect_mongodb("kotitehtavat"), query)
+    # refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
+    # count=0
+    # for task in refaktoroitu_tasks:    
+    #     count=count+1
+    #     if count>10:
+    #         #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
+    #         print("Waiting 30 seconds...")
+    #         count=0
+    #         time.sleep(30)
+    #     create_habitica_task(task, habitica_challenge)
             
-        print(f"Exam created: {task.get('text')}")
+    #     print(f"Task created: {task.get('text')}")
+
+    # #kokeet Habiticaan
+    # tasks=find_items_mongodb(connect_mongodb("kokeet"), query)
+    # refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
+    # count=0
+    # for task in refaktoroitu_tasks:    
+    #     count=count+1
+    #     if count>10:
+    #         #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
+    #         print("Waiting 30 seconds...")
+    #         count=0
+    #         time.sleep(30)
+    #     create_habitica_task(task, habitica_challenge)
+            
+    #     print(f"Exam created: {task.get('text')}")
 
 if __name__ == "__main__":
   main()

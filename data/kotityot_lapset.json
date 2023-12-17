@@ -1,0 +1,136 @@
+[
+    {
+          "type": "daily",
+          "text": "10 sanaa",
+          "notes": "Opi 10 uutta sanaa.",
+          "frequency": "daily",
+          "priority": "1"
+        },
+    {
+          "type": "daily",
+          "text": "Pyykit",
+          "notes": "Vie omat pyykit paikalleen",
+          "everyX": "4",
+          "priority": "1,5"
+        },
+    {
+          "type": "daily",
+          "text": "Ripusta pyykit",
+          "notes": "Ripusta pestyt pyykit.",
+          "everyX": "4",
+          "priority": "1,5"
+        },
+    {
+          "type": "daily",
+          "text": "10-sormijärjestelmä",
+          "notes": "Suorita yhden kymmenjärjestelmäoppitunnin",
+          "everyX": "3",
+          "priority": "1.5"
+        },
+        {
+          "type": "daily",
+          "text": "Täytä astianpesukoneen",
+          "notes": "Astioiden esipesu ja astiankoneen täyttäminen",
+          "frequency": "daily",
+          "priority": "1"
+        },
+        {
+          "type": "daily",
+          "text": "Pura astiat astianpesukoneesta",
+          "notes": "Tyhjennä astianpesukone pestyistä astioista",
+          "frequency": "daily",
+          "priority": "1"
+        },
+        {
+          "type": "daily",
+          "text": "Pyyhi työtasot",
+          "notes": "Pyyhi keittiön työtasot ja keittiön pöydän",
+          "frequency": "daily",
+          "priority": "1"
+         
+        },
+        {
+          "type": "daily",
+          "text": "Pese hamsterin ruokakupit ja ruoki hamsteri",
+          "notes": "Puhdista hamsterin ruokakupit ja anna ruokaa",
+          "frequency": "daily",
+          "priority": "1"
+        },
+    {
+          "type": "daily",
+          "text": "Hamsterin häkin kevyt siivous",
+          "notes": "Siivoa hamsterin häkki, kevyt siivous",
+          "frequency": "daily",
+          "priority": "1.5"
+        },
+        {
+          "type": "daily",
+          "text": "Puhdista hamsterin purut",
+          "notes": "Puhdista ja vaihda hamsterin häkin purut",
+          "frequency": "daily",
+          "priority": "2"
+        },
+        {
+          "type": "daily",
+          "text": "Järjestä omat tavarat",
+          "notes": "Laita henkilökohtaiset tavarat paikoilleen",
+          "frequency": "daily",
+          "priority": "1"
+        },
+        {
+          "type": "daily",
+          "text": "Moppaa lattiat",
+          "notes": "Puhdista lattiat moppaamalla",
+          "frequency": "weekly",
+          "priority": "2"
+        },
+        {
+          "type": "daily",
+          "text": "Pölyjen pyyhkiminen",
+          "notes": "Pyyhi pölyt pinnoilta",
+          "frequency": "weekly",
+          "priority": "1"
+        },
+        {
+          "type": "daily",
+          "text": "Imuroi työhuoneen",
+          "notes": "Imuroi työhuone",
+          "frequency": "weekly",
+          "priority": "1"
+        },
+       {
+          "type": "daily",
+          "text": "Imuroi lastenhuoneen",
+          "notes": "Imuroi lastenhuoneen",
+          "frequency": "weekly",
+          "priority": "1.5"
+        },
+    {
+          "type": "daily",
+          "text": "Imuroi olohuoneen",
+          "notes": "Imuroi olohuoneen",
+          "frequency": "weekly",
+          "priority": "2"
+        },
+    {
+          "type": "daily",
+          "text": "Imuroi makuuhuoneen",
+          "notes": "Imuroi makuuhuoneen",
+          "frequency": "weekly",
+          "priority": "1"
+        },
+        {
+          "type": "daily",
+          "text": "Puhdista alueesi",
+          "notes": "Siivoa oma alueesi. Sisältää tavaroitesi järjestelyn ja alueesi pintojen pyyhkiminen.",
+          "frequency": "weekly",
+          "priority": "1"
+        },
+        {
+          "type": "daily",
+          "text": "Pyyhi pinnat",
+          "notes": "Pyyhi ovet ja oven kahvat kostealla liinalla.",
+          "frequency": "monthly",
+          "priority": "2"
+        }
+      ] 
