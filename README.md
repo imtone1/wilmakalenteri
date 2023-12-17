@@ -52,6 +52,15 @@ pip install -r requirements.txt
 
 Lisäksi tarvitset tätä sovellusta varten Google Calendar API:n. Tarkat ohjeet löytyvät Googlen omilta sivuilta [Python quickstart](https://developers.google.com/calendar/api/quickstart/python)
 
+HUOM! Muista valita oikean scopen tai muokkaa sen koodiin: 
+Koodissa on scopeksi määritelty: https://www.googleapis.com/auth/calendar.events   ***(View and edit events on all your calendars)***
+
+Jos vaihdat scopin token.json muodostumisen jälkeen eli ensin ajettua koodin niin poista token.json tiedosto ja aja koodi uudelleen. Tämä luo uuden token.json tiedoston uudella scopella.
+
+Lisätiedot Google kalenterin OAuth skopeista löydät sivustolta: https://developers.google.com/identity/protocols/oauth2/scopes#calendar
+
+### Tietokanta
+
 Tietokantana on osassa MongoDB. Lisätietoa miten luoda MongoDB tietokanta [täältä](https://www.mongodb.com/docs/atlas/getting-started/).
 
 Voit testata tietokantayhteyden ajamalla extra_functions/mongodbconnection.py tiedoston.
