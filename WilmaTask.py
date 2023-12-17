@@ -1,47 +1,91 @@
-# .env tiedostosta
+# .env tiedostosta ympäristömuuttujat
 import os
 from dotenv import load_dotenv
 
+#Web scraping
 from bs4 import BeautifulSoup as bs
 import requests
 
 import json
-from datetime import datetime, timedelta, timezone
 
+#datetime
+from datetime import datetime, timedelta, timezone
+import time
+
+#mongoDB
 from pymongo import MongoClient
 
-calendarID = os.environ["CALENDAR_FAMILY"]
-
 #Google API
+calendarID = os.environ["CALENDAR_FAMILY"]
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-import time
-
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/calendar"]
+#https://www.googleapis.com/auth/calendar > See, edit, share, and permanently delete all the calendars you can access using Google Calendar
+# SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
+#Alennettu oikeudet, koska ei tarvita niin laajat oikeudet
+#https://www.googleapis.com/auth/calendar.events >	View and edit events on all your calendars
+
+#Lisätiedot sivustolta: https://developers.google.com/identity/protocols/oauth2/scopes#calendar
+SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
+
+#ympäristömuuttujat
 load_dotenv()
 WILMA_STUDENT = os.environ["WILMA_STUDENT"]
 
-#Wilmaan kirjautuminen ja oppilaan hakeminen
+
+#############################################################################################################
+#WILMA
+
+#kirjautuu wilmaan
+def wilma_signin():
+    '''Kirjautuu Wilmaan ja palauttaa kirjautumisen sekä sessionin'''
+
+    login_url = os.environ["WILMA_URL"]
+    login = os.environ["WILMA_LOGIN"]
+    password = os.environ["WILMA_PASSWORD"]
+    URL = login_url
+    LOGIN_ROUTE = '/login'
+    HEADERS = {'origin': URL, 'referer': URL + LOGIN_ROUTE}
+    #jos ei toimi, käytä tätä
+    # HEADERS = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36', 'origin': URL, 'referer': URL + LOGIN_ROUTE}
+    session = requests.session()
+    cookie_token = session.get(URL).cookies['Wilma2LoginID']
+    login_payload = {
+            'Login': login,
+            'Password': password, 
+            'SESSIONID': cookie_token
+            }
+    login_req = session.post(URL + LOGIN_ROUTE, headers=HEADERS, data=login_payload)
+    #jos statuskoodi on 200, niin kirjautuminen onnistui
+    print(f"Wilma login status code: {login_req.status_code}")
+    #tallennetaan varmuuden vuoksi
+    cookies = login_req.cookies
+
+    return login_req, session
+
+#Oppilaan hakeminen Wilmasta
 def wilma_student(login_req, session, wilma_student=WILMA_STUDENT):
+    '''Oppilaan hakeminen Wilmasta'''
+
     soup = bs(login_req.text, 'html.parser')
     # print(soup)
     # Etsitään linkki, joka sisältää oppilaan nimen
     oppilas_link = soup.find('a', string=wilma_student)
     if oppilas_link:
-        # Linkki
+        # Oppilaan linkki
         oppilas_url = oppilas_link['href']
         return session, oppilas_url
     else:
         print("There is no such student.")
 
 def wilma_subject(session, oppilas_url):
-    # Siirrytään oppilaan sivulle
+    '''Siirrytään oppilaan sivulle. Haetaan oppilaan sivulta aineet sekä wilma_homeworks-funktiolla kotitehtävät'''
+
     oppilaansivu=session.get(os.environ["WILMA_URL"] + oppilas_url)
 
     soup=bs(oppilaansivu.text, 'html.parser')
@@ -60,11 +104,9 @@ def wilma_subject(session, oppilas_url):
     print(f"Links: {links}")
 
 def wilma_homeworks(session, link_url, subject_text):
-
+    '''Haetaan kotitehtävät ja tallennetaan tietokantaan'''
      #mongoDB
     kotitehtava_db = connect_mongodb("kotitehtavat")
-    
-    created = datetime.now(tz=timezone.utc)
 
     # Siirrytään aineen sivulle
     kotitehtavasivu=session.get(os.environ["WILMA_URL"] + link_url)
@@ -112,39 +154,55 @@ def wilma_homeworks(session, link_url, subject_text):
 
 #Wilman kokeiden haku sekä tallennus tietokantaan
 def wilma_exams(session, oppilas_url):
-        #mongoDB
-        kokeet_db = connect_mongodb("kokeet")
-        created = datetime.now(tz=timezone.utc)
-        # Siirrytään oppilaiden kokeiden sivulle
-        oppilaansivu=session.get(os.environ["WILMA_URL"] + oppilas_url+"/exams/calendar")
-        soup=bs(oppilaansivu.text, 'html.parser')
-        tables = soup.select('#main-content .table')
+    '''Haetaan kokeet ja tallennetaan tietokantaan'''
+    #mongoDB
+    kokeet_db = connect_mongodb("kokeet")
 
-        for table in tables:
-            row = table.find_all('tr')
-            start = row[0].select_one('td:nth-of-type(1) strong').text
-            subject = row[0].select_one('td:nth-of-type(2)').text
-            description = row[2].select_one('td').text
-            subject_strip = subject.strip()
-            subject_list = subject_strip.split('\r\n')
-            # Valitaan splitatusta arvot
-            # print(subject_list)
-            subject = subject_list[0].strip() + subject_list[1].strip() + subject_list[2].strip()
-            #ensimmäinen arvo on viikonpäivä, joten valitaan toinen
-            pvm = start.split(' ')[1]
-            start_obj = datetime.strptime(pvm, "%d.%m.%Y")
-            start_aamu = start_obj + timedelta(hours=6)
-            start = start_aamu.isoformat()
-            # Luodaan loppuaika, joka on yksi tunti alkamisen jälkeen
-            yksitunti = start_aamu + timedelta(hours=1)
-            stop = yksitunti.isoformat()
+    # Siirrytään oppilaiden kokeiden sivulle
+    oppilaansivu=session.get(os.environ["WILMA_URL"] + oppilas_url+"/exams/calendar")
+    soup=bs(oppilaansivu.text, 'html.parser')
+    tables = soup.select('#main-content .table')
+
+    for table in tables:
+        row = table.find_all('tr')
+        start = row[0].select_one('td:nth-of-type(1) strong').text
+        subject = row[0].select_one('td:nth-of-type(2)').text
+        description = row[2].select_one('td').text
+        subject_strip = subject.strip()
+        subject_list = subject_strip.split('\r\n')
+        # Valitaan splitatusta arvot
+        # print(subject_list)
+        subject = subject_list[0].strip() + subject_list[1].strip() + subject_list[2].strip()
+        #ensimmäinen arvo on viikonpäivä, joten valitaan toinen
+        pvm = start.split(' ')[1]
+        start_obj = datetime.strptime(pvm, "%d.%m.%Y")
+        start_aamu = start_obj + timedelta(hours=6)
+        start = start_aamu.isoformat()
+        # Luodaan loppuaika, joka on yksi tunti alkamisen jälkeen
+        yksitunti = start_aamu + timedelta(hours=1)
+        stop = yksitunti.isoformat()
+        
+        now = datetime.now()
+        #tallennetaan vain tulevat tehtävät
+        if start_obj > now:
+            add_unique_item_mongodb(subject, description, start, stop, kokeet_db)
+
+#############################################################################################################
+#MONGODB
             
-            now = datetime.now()
-            #tallennetaan vain tulevat tehtävät
-            if start_obj > now:
-                add_unique_item_mongodb(subject, description, start, stop, kokeet_db)
-           
+#yhdistää tietokantaan ja palauttaa kokoelman
+def connect_mongodb(collection):
+    '''Yhdistää tietokantaan ja palauttaa kokoelman'''
+    #mongoDB
+    atlas_uri = os.environ["ATLAS_URI"]
+    client = MongoClient(atlas_uri)
+    db = client["wilma"]
+    collection_db = db[collection]
+
+    return collection_db   
+       
 def add_unique_item_mongodb(subject, description, start, stop, db):
+    '''Tallennetaan tietokantaan, jos ei ole jo olemassa'''
     now = datetime.now()
     doc = {
         "summary": subject,
@@ -170,98 +228,25 @@ def add_unique_item_mongodb(subject, description, start, stop, db):
     else:
         print("Document already exists")
 
-#kirjautuu wilmaan
-def wilma_signin():
-    login_url = os.environ["WILMA_URL"]
-    login = os.environ["WILMA_LOGIN"]
-    password = os.environ["WILMA_PASSWORD"]
-    URL = login_url
-    LOGIN_ROUTE = '/login'
-    HEADERS = {'origin': URL, 'referer': URL + LOGIN_ROUTE}
-    #jos ei toimi, käytä tätä
-    # HEADERS = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36', 'origin': URL, 'referer': URL + LOGIN_ROUTE}
-    session = requests.session()
-    cookie_token = session.get(URL).cookies['Wilma2LoginID']
-    login_payload = {
-            'Login': login,
-            'Password': password, 
-            'SESSIONID': cookie_token
-            }
-    login_req = session.post(URL + LOGIN_ROUTE, headers=HEADERS, data=login_payload)
-    #jos statuskoodi on 200, niin kirjautuminen onnistui
-    print(f"Wilma login status code: {login_req.status_code}")
-    #tallennetaan varmuuden vuoksi
-    cookies = login_req.cookies
-
-    return login_req, session
-
-#yhdistää tietokantaan ja palauttaa kokoelman
-def connect_mongodb(collection):
-    #mongoDB
-    atlas_uri = os.environ["ATLAS_URI"]
-    client = MongoClient(atlas_uri)
-    db = client["wilma"]
-    collection_db = db[collection]
-
-    return collection_db
-
 #löytää dokumentit tietokannasta
 def find_items_mongodb(collection, query={}):
-
+    '''Etsii dokumentit tietokannasta annetun queryn avulla'''
     documents = collection.find(query)
 
     return documents
 
-#palauttaa refaktoroidun listan google kalenteriin vietäväksi
-#Käytännössä poistetaan created
-def refactor_events(events):
-    events_list = []
+def delete_from_mongodb(collection, query={}):
+    '''Poistaa dokumentit tietokannasta annetun queryn avulla'''
+    result = collection.delete_many(query)
+    print(f"Documents deleted: {result.deleted_count}")
 
-    for doc in events:
-        #muotoillaan
-        event = {
-            "summary": doc["summary"],
-            "description": doc["description"],
-            "start": {
-                "dateTime": doc["start"]["dateTime"],
-                'timeZone': "Europe/Helsinki"
-            },
-            "end": {
-                "dateTime": doc["end"]["dateTime"],
-                'timeZone': "Europe/Helsinki"
-            }
-        }
 
-        print(event)
-
-        #lisätään listaan
-        events_list.append(event)
-    return events_list
-
-#Muotoillaan tehtävä Habiticaan sopivaksi
-def refactor_to_habitica_tasks(tasks):
-    tasks_list = []
-    for doc in tasks:
-        #muotoillaan
-        task = {
-            "type": "todo",
-            "text": doc["summary"],
-            "notes": doc["description"],
-            "priority": "0.1",
-            "date": doc["start"]["dateTime"]
-        }
-
-        print(f"Task: {task}")
-
-        #lisätään listaan
-        tasks_list.append(task)
-
-    return tasks_list
-
+#############################################################################################################
+#GOOGLE CALENDAR
 #Kirjautuminen Googlen kalenteriin
 def google_calendar_token():
-    """Tokens Google API
-    """
+    '''Kirjautuu Google API:in ja palauttaa service:n'''
+
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -286,6 +271,7 @@ def google_calendar_token():
     return service
 
 def show_calendar_events(calendarID="primary"):
+    '''Näyttää syötetyn kalenterin kalenteritapahtumat. Oletuksena 'primary'-kalenteri'''
     try:
         service = google_calendar_token()
        
@@ -316,14 +302,71 @@ def show_calendar_events(calendarID="primary"):
     except HttpError as error:
         print(f"An error occurred in Google Calendar showing event: {error}")
 
+
+#palauttaa refaktoroidun listan google kalenteriin vietäväksi
+#Käytännössä poistetaan created
+def refactor_events(events):
+    '''Palauttaa refaktoroidun listan google kalenteriin vietäväksi
+    Käytännössä poistetaan created'''
+    events_list = []
+
+    for doc in events:
+        #muotoillaan
+        event = {
+            "summary": doc["summary"],
+            "description": doc["description"],
+            "start": {
+                "dateTime": doc["start"]["dateTime"],
+                'timeZone': "Europe/Helsinki"
+            },
+            "end": {
+                "dateTime": doc["end"]["dateTime"],
+                'timeZone': "Europe/Helsinki"
+            }
+        }
+
+        print(event)
+
+        #lisätään listaan
+        events_list.append(event)
+    return events_list
+        
+
 #luo kalenteritapahtuman
 def create_calendar_event(event, calendarID):
-  service = google_calendar_token()
-  event = service.events().insert(calendarId=calendarID, body=event).execute()
-  print(f"Event created: {event.get('htmlLink')}")
+    '''Luo Google kalenteritapahtuman'''
+    service = google_calendar_token()
+    event = service.events().insert(calendarId=calendarID, body=event).execute()
+    print(f"Event created: {event.get('htmlLink')}")
+
+
+#############################################################################################################
+#HABITICA
+    
+#Muotoillaan tehtävä Habiticaan sopivaksi
+def refactor_to_habitica_tasks(tasks):
+    '''Muotoillaan tehtävä Habiticaan sopivaksi'''
+    tasks_list = []
+    for doc in tasks:
+        #muotoillaan
+        task = {
+            "type": "todo",
+            "text": doc["summary"],
+            "notes": doc["description"],
+            "priority": "0.1",
+            "date": doc["start"]["dateTime"]
+        }
+
+        print(f"Task: {task}")
+
+        #lisätään listaan
+        tasks_list.append(task)
+
+    return tasks_list
 
 # Yhden tehtävän lisäämiseen
 def create_habitica_task(task_data, challenge_id=os.environ["HABITICA_CHALLENGE1"] ):
+    '''Lisää yhden tehtävän Habiticaan'''
     try:
         habitica_api_user = os.environ["HABITICA_API_USER"]
         habitica_api_key = os.environ["HABITICA_API_KEY"]
@@ -348,6 +391,7 @@ def create_habitica_task(task_data, challenge_id=os.environ["HABITICA_CHALLENGE1
 
 # Useamman tehtävän lisäämiseen
 def create_all_habitica_tasks(tasks, challenge_id=os.environ["HABITICA_CHALLENGE1"]):
+    '''Lisää useamman tehtävän Habiticaan create_habitica_task-funktiolla'''
     results = []
 
     for task in tasks:
@@ -360,56 +404,61 @@ def create_all_habitica_tasks(tasks, challenge_id=os.environ["HABITICA_CHALLENGE
 
     return results
 
+#############################################################################################################
+#TIEDOSTOISTA LUKEMINEN, JSON
+
 # Tehtävien lataamiseen tiedostosta. Huom! json-muoto
 def load_from_json(filename):
+    '''Lataa tehtävät tiedostosta. Huom! json-muoto'''
     with open(filename, 'r', encoding='utf-8') as file:
         tasks = json.load(file)
     return tasks
 
-def delete_from_mongodb(collection, query={}):
-    result = collection.delete_many(query)
-    print(f"Documents deleted: {result.deleted_count}")
+#############################################################################################################
+#Suorittaminen
 
 def main():
 
-    # WILMA_STUDENTS = os.environ["WILMA_STUDENTS"].split(",")
-    # login, session = wilma_signin()
-    # for student in WILMA_STUDENTS:
-    #     print(f"Student: {student}")
-    #     wilma_exams(*wilma_student(login, session, student))
+    WILMA_STUDENTS = os.environ["WILMA_STUDENTS"].split(",")
+    login, session = wilma_signin()
+    for student in WILMA_STUDENTS:
+        print(f"Student: {student}")
+        wilma_exams(*wilma_student(login, session, student))
         
-    #     wilma_subject(*wilma_student(login, session, student))
-    #     print("Gone through all students")
+        wilma_subject(*wilma_student(login, session, student))
+        print("Gone through all students")
 
-    # # Quory, jolla haetaan mongodb:stä, muuten palauttaa kaikki
-    # one_minute_ago = datetime.now() - timedelta(hours=0, minutes=2)
-    # query = {"created": {"$gte": one_minute_ago}}
-    # print(f"Searched from {one_minute_ago}")
+    # Query, jolla haetaan mongodb:stä, muuten palauttaa kaikki
+    one_minute_ago = datetime.now() - timedelta(hours=0, minutes=2)
+    query = {"created": {"$gte": one_minute_ago}}
+    print(f"Searched from {one_minute_ago}")
 
 
-    # # # show_calendar_events(calendarID)
-    # #haetaan kokeet tietokannasta, muokataan Google kalenteriin sopivaksi ja lisätään kalenteriin
-    # # events=find_items_mongodb(connect_mongodb("kokeet"), query)
-    # # refaktoroitu=refactor_events(events)
-    # # for doc in refaktoroitu:
-    # #     create_calendar_event(doc, calendarID)
+    # show_calendar_events(calendarID)
+    ##haetaan kokeet tietokannasta, muokataan Google kalenteriin sopivaksi ja lisätään kalenteriin
+    events=find_items_mongodb(connect_mongodb("kokeet"), query)
+    refaktoroitu=refactor_events(events)
+    for doc in refaktoroitu:
+        create_calendar_event(doc, calendarID)
     
-    # try:
-    #     #poistetaan vanhat kokeet
-    #     # 30 päivää vanhemmat
-    #     thirty_days_ago = datetime.now() - timedelta(days=30)
+    try:
+        #poistetaan vanhat kokeet
+        # 30 päivää vanhemmat
+        thirty_days_ago = datetime.now() - timedelta(days=30)
 
-    #     query_delete={"created": {"$lt": thirty_days_ago}}
-    #     delete_from_mongodb(connect_mongodb("kokeet"), query_delete)
-    #     delete_from_mongodb(connect_mongodb("kotitehtavat"), query_delete)
+        query_delete={"created": {"$lt": thirty_days_ago}}
+        delete_from_mongodb(connect_mongodb("kokeet"), query_delete)
+        delete_from_mongodb(connect_mongodb("kotitehtavat"), query_delete)
 
-    # except Exception as error:
-    #     print(f"Error in deleting kokeet or kotitehtävät: {error}")
+    except Exception as error:
+        print(f"Error in deleting kokeet or kotitehtävät: {error}")
 
-    # #ei suoriteta Habiticaa, jos sitä ei ole asetettu
-    # if (os.environ["HABITICA_CHALLENGE1"] == "0"):
-    #     print("Habitica challenge not set. Set it in .env file if you want to add tasks to Habitica.")
-    #     return
+    #############################################################################################################
+    #HABITICA suoritus
+    #ei suoriteta Habiticaa, jos sitä ei ole asetettu
+    if (os.environ["HABITICA_CHALLENGE1"] == "0"):
+        print("Habitica challenge not set. Set it in .env file if you want to add tasks to Habitica.")
+        return
     
     #Lisätään kotityöt Habiticaan
     tasks=load_from_json('data\kotityot_lapset.json')
@@ -426,35 +475,35 @@ def main():
             
         print(f"Task created: {task.get('text')}")
 
-    # habitica_challenge= os.environ["HABITICA_CHALLENGE1"]
-    # # tasks=find_items_mongodb(connect_mongodb("kotitehtavat"), query)
-    # refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
-    # count=0
-    # for task in refaktoroitu_tasks:    
-    #     count=count+1
-    #     if count>10:
-    #         #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
-    #         print("Waiting 30 seconds...")
-    #         count=0
-    #         time.sleep(30)
-    #     create_habitica_task(task, habitica_challenge)
+    habitica_challenge= os.environ["HABITICA_CHALLENGE1"]
+    tasks=find_items_mongodb(connect_mongodb("kotitehtavat"), query)
+    refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
+    count=0
+    for task in refaktoroitu_tasks:    
+        count=count+1
+        if count>10:
+            #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
+            print("Waiting 30 seconds...")
+            count=0
+            time.sleep(30)
+        create_habitica_task(task, habitica_challenge)
             
-    #     print(f"Task created: {task.get('text')}")
+        print(f"Task created: {task.get('text')}")
 
-    # #kokeet Habiticaan
-    # tasks=find_items_mongodb(connect_mongodb("kokeet"), query)
-    # refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
-    # count=0
-    # for task in refaktoroitu_tasks:    
-    #     count=count+1
-    #     if count>10:
-    #         #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
-    #         print("Waiting 30 seconds...")
-    #         count=0
-    #         time.sleep(30)
-    #     create_habitica_task(task, habitica_challenge)
+    #kokeet Habiticaan
+    tasks=find_items_mongodb(connect_mongodb("kokeet"), query)
+    refaktoroitu_tasks=refactor_to_habitica_tasks(tasks)
+    count=0
+    for task in refaktoroitu_tasks:    
+        count=count+1
+        if count>10:
+            #odota 30 sekuntia, jotta Habitica ei rajoita liikaa (max 30 requests in a minute)
+            print("Waiting 30 seconds...")
+            count=0
+            time.sleep(30)
+        create_habitica_task(task, habitica_challenge)
             
-    #     print(f"Exam created: {task.get('text')}")
+        print(f"Exam created: {task.get('text')}")
 
 if __name__ == "__main__":
   main()
