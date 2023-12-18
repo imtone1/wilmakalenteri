@@ -15,6 +15,9 @@ import time
 #mongoDB
 from pymongo import MongoClient
 
+#ympäristömuuttujat
+load_dotenv()
+
 #Google API
 calendarID = os.environ["CALENDAR_FAMILY"]
 from google.auth.transport.requests import Request
@@ -33,8 +36,7 @@ from googleapiclient.errors import HttpError
 #Lisätiedot sivustolta: https://developers.google.com/identity/protocols/oauth2/scopes#calendar
 SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
 
-#ympäristömuuttujat
-load_dotenv()
+
 WILMA_STUDENT = os.environ["WILMA_STUDENT"]
 
 
