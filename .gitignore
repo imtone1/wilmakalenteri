@@ -10,3 +10,4 @@ data/*db
 # events.txt
 # output.txt
 .env
+muuttujat.py

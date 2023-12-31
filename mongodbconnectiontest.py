@@ -1,13 +1,10 @@
 # 
-import os
-from dotenv import load_dotenv
-
-load_dotenv() # runs "export key=value" on all our key/value pairs in .env
+from muuttujat import ATLAS_URI
 
 # Tällä vaan testataan yhteyttä MongoDB:hen. Koodi on kopioitu MongoDB:n sivuilta.
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-uri = os.environ["ATLAS_URI"]
+uri = ATLAS_URI
 
 def create_mongodb_connection(uri):
     
@@ -22,3 +19,5 @@ def create_mongodb_connection(uri):
     except Exception as e:
         print(e)
         return False
+    
+create_mongodb_connection(uri)

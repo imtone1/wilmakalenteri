@@ -42,6 +42,9 @@ Linux tai Mac tietokoneissa
 ```bash
 source .venv/bin/activate
 ```
+
+Tiedät, että virtuaaliympäristö on aktivoitu, kun näet (.venv) komentorivellä. Nyt voit asentaa riippuvuudet siihen.
+
 ## Riippuvuudet
 
 Asenna tarvittavat kirjastot komennolla
@@ -50,42 +53,31 @@ Asenna tarvittavat kirjastot komennolla
 pip install -r requirements.txt
 ```
 
-Lisäksi tarvitset tätä sovellusta varten Google Calendar API:n. Tarkat ohjeet löytyvät Googlen omilta sivuilta [Python quickstart](https://developers.google.com/calendar/api/quickstart/python)
+# Käyttö ensimmäisellä kerralla
 
-HUOM! Muista valita oikean scopen tai muokkaa sen koodiin: 
-Koodissa on scopeksi määritelty: https://www.googleapis.com/auth/calendar.events   ***(View and edit events on all your calendars)***
+Kun ajat sovellusta ensimmäisen kerran tarkistetaan toimiiko Wilma. Lue virtuaaliympäristö ja asenna riippuvuudet. Muuta tiedostossa muuttujat.txt olevat muuttujat haluamiksesi ja nimeä tiedosto muuttujat.py-tiedostoksi. Katsoakseen toimiiko Wilma tarvitsee määritellä vain nämä:
 
-Jos vaihdat scopin token.json muodostumisen jälkeen eli ensin ajettua koodin niin poista token.json tiedosto ja aja koodi uudelleen. Tämä luo uuden token.json tiedoston uudella scopella.
+```python
+WILMA_URL="wilman soite yleensä .inschool.fi loppuinen"
+WILMA_LOGIN="kayttajatunnus"
+WILMA_PASSWORD="salasana"
+WILMA_STUDENT="Etunimi Sukunimi"
+WILMA_STUDENTS="Etunimi Sukunimi,Etunimi Sukunimi"
+LOGIN_ROUTE = "/login"
+COOKIE="Wilma2LoginID"
+```
 
-Lisätiedot Google kalenterin OAuth skopeista löydät sivustolta: https://developers.google.com/identity/protocols/oauth2/scopes#calendar
-
-### Tietokanta
-
-Tietokantana on osassa MongoDB. Lisätietoa miten luoda MongoDB tietokanta [täältä](https://www.mongodb.com/docs/atlas/getting-started/).
-
-Voit testata tietokantayhteyden ajamalla Test kansion testeja.
-
-
-## Käyttö
-
-Muuta tiedostossa env olevat muuttujat haluamiksesi ja nimeä tiedosto .env-tiedostoksi. Jos et käytä Habiticaa, älä muuta env-tiedoston Habitica-muuttujia.
-
-
-Tarvitset Google kalenterin id:n. Lisätietoa Google kalenterin id:stä löytyy kun menet kalenterin asetuksiin ja kopioit "Kalenterin tunnus" kohdasta kalenterin id:n. 
-
-![Google kalenterin id](./data/kuvat/Integroi_kalenteri.JPG)
-
-Tarvitset myös Habitica API:n avaimet, jos haluat lisätä tehtävät Habiticaan tämän sovelluksen avulla. Lisätietoa Habitica API:n avaimista löytyy [täältä](https://habitica.fandom.com/wiki/Guidance_for_Comrades).
-
-Habitica API:n dokumentaatio löytyy [täältä](https://habitica.com/apidoc/). Mikäli käytät Habitican API:a, muista lisätä täyttää lomakkeen, jossa kerrot mitä aiot tehdä Habitican API:lla. Lomake löytyy [täältä](https://habitica.fandom.com/wiki/Guidance_for_Comrades#Rules_for_Third-Party_Tools) > Notifying Staff About Your Tool
+Tarkista onko sinulla samat LOGIN_ROUTE ja COOKIE kuin yllä muuttujat.txt tiedostossa. Alla olevilla ohjeilla.
 
 ## BeautifulSoup
 
-Tiedosto WilmaTask.py käyttää BeautifulSoup kirjastoa Wilman sivujen parsimiseen. Lisätietoa BeautifulSoupista löytyy [täältä](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+Tiedosto Wilma.py ja WilmaTask.py käyttää BeautifulSoup kirjastoa Wilman sivujen parsimiseen. Lisätietoa BeautifulSoupista löytyy [täältä](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
 
 Sen käyttö saattaa vaatia Wilma -sivuston tarkempaa tutkimista.
 
 ### Kehittäjätyökalut (Developer Tools)
+
+Seuraavat tarvitset kirjautuakseen Wilmaan. Mikäli sinulla on eri cookie ja /login -polku niin muuta ne myös muuttujat.py tiedostoon.
 
 Navigoi Wilma -sivustolle ja avaa kehittäjätyökalut joko painamalla F12 tai oikealla hiiren näppäimellä ja valitse "Inspect". 
 
@@ -98,6 +90,41 @@ Nyt kehittäjätyökaluissa pitäisi näkyä login POST pyyntö. Etsi login pyyn
 Lisäksi tarvitsemme session cookien. Nämä löytyvät "Cookies" välilehdeltä tai samalta paikasta, josta löysimme payload tiedot "Headers" välilehdeltä. Tarkista Set-Cookie cookien nimi.
 
 ![Cookies](./data/kuvat/setcookie.JPG)
+
+
+*** Aja nyt Wilma.py-tiedosto. Jos saat status koodiksi 200 jne. niin olet valmis siirtämään ne Google kalenteriin ja MongoDB tietokantaan. ***
+
+
+# Google Calendar API
+
+Tätä sovellusta varten Google Calendar API:n. Google API:n kautta pystyt lisäämään tapahtumat Google kalenteriisi. Kun ajat sovelluksen ensimmäisen kerran, API pyytää sinua kirjautumaan google tiliisi ja siten saa linkin Google kalenterisi. Scope määrittää sen mitä tällä linkillä pystyy tekemään. Ole huoleti, kaikki tieto tästä pysyy vain sinulla sillä, jos et julkaise erikseen tämän API:n (ei onnistu vahingossa) niin kukaan muu ei pääse edes luomaan tämän linkin, jos et lisää hänen sähköpostin API:in. Tarkat ohjeet löytyvät Googlen omilta sivuilta [Python quickstart](https://developers.google.com/calendar/api/quickstart/python)
+
+HUOM! Muista valita oikean scopen tai muokkaa sen muuttujat -tiedostoon:
+
+Koodissa on scopeksi määritelty: https://www.googleapis.com/auth/calendar.events   ***(View and edit events on all your calendars)***
+
+Jos vaihdat scopin token.json muodostumisen jälkeen eli jos olet ensin ajanut koodin jo jollain scopilla niin poista token.json tiedosto ja aja koodi uudelleen. Tämä luo uuden token.json tiedoston uudella scopella.
+
+Lisätiedot Google kalenterin OAuth skopeista löydät sivustolta: https://developers.google.com/identity/protocols/oauth2/scopes#calendar
+
+### Tietokanta
+
+Tietokantana on osassa MongoDB. Lisätietoa miten luoda MongoDB tietokanta [täältä](https://www.mongodb.com/docs/atlas/getting-started/).
+
+Voit testata tietokantayhteyden ajamalla mongodbconnectiontest.py -tiedoston.
+
+
+## Käyttö
+
+<!-- Muuta tiedostossa env olevat muuttujat haluamiksesi ja nimeä tiedosto .env-tiedostoksi. Jos et käytä Habiticaa, älä muuta env-tiedoston Habitica-muuttujia. -->
+
+Tarvitset Google kalenterin id:n. Lisätietoa Google kalenterin id:stä löytyy kun menet kalenterin asetuksiin ja kopioit "Kalenterin tunnus" kohdasta kalenterin id:n. 
+
+![Google kalenterin id](./data/kuvat/Integroi_kalenteri.JPG)
+
+Tarvitset myös Habitica API:n avaimet, jos haluat lisätä tehtävät Habiticaan tämän sovelluksen avulla. Lisätietoa Habitica API:n avaimista löytyy [täältä](https://habitica.fandom.com/wiki/Guidance_for_Comrades).
+
+Habitica API:n dokumentaatio löytyy [täältä](https://habitica.com/apidoc/). Mikäli käytät Habitican API:a, muista lisätä täyttää lomakkeen, jossa kerrot mitä aiot tehdä Habitican API:lla. Lomake löytyy [täältä](https://habitica.fandom.com/wiki/Guidance_for_Comrades#Rules_for_Third-Party_Tools) > Notifying Staff About Your Tool
 
 
 ### Funktiot
