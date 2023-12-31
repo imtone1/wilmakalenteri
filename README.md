@@ -55,7 +55,7 @@ pip install -r requirements.txt
 
 # Käyttö ensimmäisellä kerralla
 
-Kun ajat sovellusta ensimmäisen kerran tarkistetaan toimiiko Wilma. Luo virtuaaliympäristö ja asenna riippuvuudet yllä olevin ohjein. Muuta tiedostossa muuttujat.txt olevat muuttujat haluamiksesi ja nimeä tiedosto muuttujat.py-tiedostoksi. Katsoakseen toimiiko Wilma sinun tarvitsee määritellä ainostaan nämä:
+Kun ajat sovellusta ensimmäisen kerran tarkistetaan toimiiko Wilma. Luo virtuaaliympäristö ja asenna riippuvuudet yllä olevin ohjein. Muuta tiedostossa muuttujat.txt olevat muuttujat haluamiksesi ja nimeä tiedosto muuttujat.py-tiedostoksi. Katsoakseen toimiiko Wilma sinun täytyy määritellä ainostaan nämä:
 
 ```python
 WILMA_URL="wilman soite yleensä .inschool.fi loppuinen"
