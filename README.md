@@ -14,7 +14,7 @@ Halusin luoda sovelluksen, jolla voisin helposti lisätä Wilman kotitehtävät 
 
 ## Asennus
 
-Suosittelen luoda virtuaaliympäristön tätä sovellusta varten. Virtuaaliympäristön luominen onnistuu seuraavalla komennolla:
+Suosittelen luoda virtuaaliympäristön tätä sovellusta varten. Voit lukea lisää virtuaaliympäristöstä [täältä](https://www.geeksforgeeks.org/python-virtual-environment/) .Virtuaaliympäristön luominen onnistuu seuraavalla komennolla:
 
 Asenna virtuaaliympäristö moduuli
 ```bash
@@ -55,7 +55,7 @@ pip install -r requirements.txt
 
 # Käyttö ensimmäisellä kerralla
 
-Kun ajat sovellusta ensimmäisen kerran tarkistetaan toimiiko Wilma. Lue virtuaaliympäristö ja asenna riippuvuudet. Muuta tiedostossa muuttujat.txt olevat muuttujat haluamiksesi ja nimeä tiedosto muuttujat.py-tiedostoksi. Katsoakseen toimiiko Wilma tarvitsee määritellä vain nämä:
+Kun ajat sovellusta ensimmäisen kerran tarkistetaan toimiiko Wilma. Luo virtuaaliympäristö ja asenna riippuvuudet yllä olevin ohjein. Muuta tiedostossa muuttujat.txt olevat muuttujat haluamiksesi ja nimeä tiedosto muuttujat.py-tiedostoksi. Katsoakseen toimiiko Wilma sinun tarvitsee määritellä ainostaan nämä:
 
 ```python
 WILMA_URL="wilman soite yleensä .inschool.fi loppuinen"
