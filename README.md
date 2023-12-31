@@ -67,32 +67,11 @@ LOGIN_ROUTE = "/login"
 COOKIE="Wilma2LoginID"
 ```
 
-Tarkista onko sinulla samat LOGIN_ROUTE ja COOKIE kuin yllä muuttujat.txt tiedostossa. Alla olevilla ohjeilla.
+Älä muuta LOGIN_ROUTE ja COOKIE muuttujia. 
 
-## BeautifulSoup
+***Aja nyt Wilma.py-tiedosto. Jos saat status koodiksi 200 jne. niin olet valmis siirtämään ne Google kalenteriin ja MongoDB tietokantaan.***
 
-Tiedosto Wilma.py ja WilmaTask.py käyttää BeautifulSoup kirjastoa Wilman sivujen parsimiseen. Lisätietoa BeautifulSoupista löytyy [täältä](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
-
-Sen käyttö saattaa vaatia Wilma -sivuston tarkempaa tutkimista.
-
-### Kehittäjätyökalut (Developer Tools)
-
-Seuraavat tarvitset kirjautuakseen Wilmaan. Mikäli sinulla on eri cookie ja /login -polku niin muuta ne myös muuttujat.py tiedostoon.
-
-Navigoi Wilma -sivustolle ja avaa kehittäjätyökalut joko painamalla F12 tai oikealla hiiren näppäimellä ja valitse "Inspect". 
-
-Navigoi kehittäjätyökaluissa "Network" välilehdelle. Täppää "Preserve log" ja yritä kirjautua (pelkkä "Kirjaudu sisään" ilman tunnuksia riittää).
-
-Nyt kehittäjätyökaluissa pitäisi näkyä login POST pyyntö. Etsi login pyyntö. Headers välilehdeltä löytyy tarvitsemanne payload tiedot. Nämä ovat otsikomme.
-
-![Headers](./data/kuvat/network_tab.JPG)
-
-Lisäksi tarvitsemme session cookien. Nämä löytyvät "Cookies" välilehdeltä tai samalta paikasta, josta löysimme payload tiedot "Headers" välilehdeltä. Tarkista Set-Cookie cookien nimi.
-
-![Cookies](./data/kuvat/setcookie.JPG)
-
-
-*** Aja nyt Wilma.py-tiedosto. Jos saat status koodiksi 200 jne. niin olet valmis siirtämään ne Google kalenteriin ja MongoDB tietokantaan. ***
+Mikäli saat virheen kirjautuessaan niin tarkista siirry BeautifulSoup osioon ja tarkista LOGIN_ROUTE ja COOKIE.
 
 
 # Google Calendar API
@@ -149,3 +128,24 @@ Habitica API:n dokumentaatio löytyy [täältä](https://habitica.com/apidoc/). 
 | `refactor_to_habitica_tasks` | Muotoillaan tehtävä Habiticaan sopivaksi.    | `text` (tehtävän teksti), `notes` (tehtävän muistiinpanot) | Palauttaa muotoillun tehtävän Habiticaa varten |
 | `delete_from_mongodb`      | Poistaa dokumentteja annetusta MongoDB-kokoelmasta. | `collection` (MongoDB-kokoelma), `query` (poistoehto, oletusarvo {}) | Tulostaa poistettujen dokumenttien määrän  |
 
+## BeautifulSoup
+
+Tiedosto Wilma.py ja WilmaTask.py käyttää BeautifulSoup kirjastoa Wilman sivujen parsimiseen. Lisätietoa BeautifulSoupista löytyy [täältä](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+
+Sen käyttö saattaa vaatia Wilma -sivuston tarkempaa tutkimista.
+
+### Kehittäjätyökalut (Developer Tools)
+
+Seuraavat tarvitset kirjautuakseen Wilmaan. Mikäli sinulla on eri cookie ja /login -polku niin muuta ne myös muuttujat.py tiedostoon.
+
+Navigoi Wilma -sivustolle ja avaa kehittäjätyökalut joko painamalla F12 tai oikealla hiiren näppäimellä ja valitse "Inspect". 
+
+Navigoi kehittäjätyökaluissa "Network" välilehdelle. Täppää "Preserve log" ja yritä kirjautua (pelkkä "Kirjaudu sisään" ilman tunnuksia riittää).
+
+Nyt kehittäjätyökaluissa pitäisi näkyä login POST pyyntö. Etsi login pyyntö. Headers välilehdeltä löytyy tarvitsemanne payload tiedot. Nämä ovat otsikomme.
+
+![Headers](./data/kuvat/network_tab.JPG)
+
+Lisäksi tarvitsemme session cookien. Nämä löytyvät "Cookies" välilehdeltä tai samalta paikasta, josta löysimme payload tiedot "Headers" välilehdeltä. Tarkista Set-Cookie cookien nimi.
+
+![Cookies](./data/kuvat/setcookie.JPG)
