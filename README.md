@@ -110,12 +110,12 @@ Habitica API:n dokumentaatio löytyy [täältä](https://habitica.com/apidoc/). 
 
 | Funktion nimi             | Kuvaus                                           | Parametrit                                                                                               | Palauttaa                                   |
 |---------------------------|--------------------------------------------------|----------------------------------------------------------------------------------------------------------|--------------------------------------------|
-| `wilma_student`           | Kirjautuu Wilmaan ja hakee oppilaan.             | `login_req` (HTTP-vastaus), `session` (istunto), `wilma_student` (oppilaan nimi, oletusarvo)             | `session`, `oppilas_url`                   |
-| `wilma_subject`           | Hakee oppilaan kouluaineet.                      | `session` (istunto), `oppilas_url` (oppilaan URL)                                                        | Tulostaa aineiden linkit                   |
-| `wilma_homeworks`         | Hakee ja käsittelee kotitehtävät.                | `session` (istunto), `link_url` (aineen URL), `subject_text` (aineen teksti)                             | Tulostaa kotitehtävät                      |
+| `wilma_signin`            | Kirjautuu Wilmaan ja palauttaa kirjautumisen sekä sessionin. | Ei parametreja.                                                                              | `login_req` (HTTP-vastaus), `session` (istunto) |
+| `wilma_student`           | Oppilaan hakeminen Wilmasta.                     | `login_req` (HTTP-vastaus), `session` (istunto), `wilma_student` (oppilaan nimi, oletusarvo)             | `oppilas_url`                               |
+| `wilma_subject`           | Siirrytään oppilaan sivulle. Haetaan oppilaan sivulta aineet. Palautetaan tuple listan aineiden url ja aineen. | `session` (istunto), `oppilas_url` (oppilaan URL)                                        | `links` (Lista tupleja, joissa aineiden URL ja teksti) |
+| `wilma_homeworks`         | Haetaan kotitehtävät ja tallennetaan tietokantaan. | `session` (istunto), `link_url` (aineen URL), `subject_text` (aineen teksti)                             | Ei palauta mitään, tulostaa ja tallentaa kotitehtävät tietokantaan. Tulostaa kotitehtävät  |
 | `wilma_exams`             | Hakee ja tallentaa kokeiden tiedot.              | `session` (istunto), `oppilas_url` (oppilaan URL)                                                        | Tulostaa kokeiden tiedot                   |
 | `add_unique_item_mongodb` | Lisää dokumentin MongoDB-tietokantaan.           | `subject` (aihe), `description` (kuvaus), `start` (alkamisaika), `stop` (loppumisaika), `created` (luomisaika), `db` (tietokanta) | Tulostaa lisäysstatus                    |
-| `wilma_signin`            | Kirjautuu Wilmaan.                               | -                                                                                                        | `login_req` (HTTP-vastaus), `session` (istunto) |
 | `connect_mongodb`         | Yhdistää MongoDB-tietokantaan.                   | `collection` (MongoDB-kokoelma)                                                                          | Palauttaa MongoDB-kokoelman               |
 | `find_items_mongodb`      | Hakee dokumentit MongoDB-kokoelmasta.            | `collection` (MongoDB-kokoelma), `query` (hakuehto, oletusarvo {})                                       | MongoDB-dokumenttien iteroitava kokoelma  |
 | `refactor_events`         | Muotoilee MongoDB:n dokumentit Google Kalenteriin sopiviksi tapahtumiksi. | `events` (MongoDB:n dokumenttien lista)                                         | Google kalenteriin sopiva muotoiltujen tapahtumien lista             |
@@ -127,6 +127,11 @@ Habitica API:n dokumentaatio löytyy [täältä](https://habitica.com/apidoc/). 
 | `load_from_json`           | Lataa tehtäviä JSON-tiedostosta.                | `filename` (JSON-tiedoston polku)                                                                    | Lataa ja palauttaa tehtävät tiedostosta   |
 | `refactor_to_habitica_tasks` | Muotoillaan tehtävä Habiticaan sopivaksi.    | `text` (tehtävän teksti), `notes` (tehtävän muistiinpanot) | Palauttaa muotoillun tehtävän Habiticaa varten |
 | `delete_from_mongodb`      | Poistaa dokumentteja annetusta MongoDB-kokoelmasta. | `collection` (MongoDB-kokoelma), `query` (poistoehto, oletusarvo {}) | Tulostaa poistettujen dokumenttien määrän  |
+
+
+***Wilman funktiot***
+
+![Wilman funktiot](./data/kuvat/Wilma_funktiot.PNG)
 
 ## BeautifulSoup
 

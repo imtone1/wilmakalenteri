@@ -1,4 +1,4 @@
-#muuttjat
+#muuttujat
 from muuttujat import *
 
 #Web scraping
@@ -8,8 +8,7 @@ import requests
 import json
 
 #datetime
-from datetime import datetime, timedelta, timezone
-import time
+from datetime import datetime, timedelta
 
 #mongoDB
 from pymongo import MongoClient
@@ -74,12 +73,12 @@ def wilma_student(login_req, session, wilma_student=WILMA_STUDENT):
     if oppilas_link:
         # Oppilaan linkki
         oppilas_url = oppilas_link['href']
-        return session, oppilas_url
+        return oppilas_url
     else:
         print("There is no such student.")
 
 def wilma_subject(session, oppilas_url):
-    '''Siirrytään oppilaan sivulle. Haetaan oppilaan sivulta aineet sekä wilma_homeworks-funktiolla kotitehtävät'''
+    '''Siirrytään oppilaan sivulle. Haetaan oppilaan sivulta aineet. Palautetaan tuple listan aineiden url ja aineen.'''
 
     oppilaansivu=session.get(WILMA_URL + oppilas_url)
 
@@ -87,6 +86,7 @@ def wilma_subject(session, oppilas_url):
     tables = soup.select('#main-content .table', {"class": "table index-table"})
 
     links = []
+    #links.append(("linkkiurl", "link_text"))
     for table in tables:
         rows = table.find_all('tr')
         for row in rows:
@@ -94,11 +94,11 @@ def wilma_subject(session, oppilas_url):
             if link_element:
                 link_url = link_element.get('href')
                 link_text = link_element.get_text(separator=' ', strip=True)
-                #links append tuple (link_url, link_text)
+                #Lisätään listaan tuple (link_url, link_text)     
                 links.append((link_url, link_text))
-                #links.append(link_text)
-                wilma_homeworks(session, link_url, link_text)
-    print(f"Links: {links}")
+                # wilma_homeworks(session, link_url, link_text)
+    print(f"Links: {links} from wilma_subject function.")
+    return links
 
 def wilma_homeworks(session, link_url, subject_text):
     '''Haetaan kotitehtävät ja tallennetaan tietokantaan'''
@@ -130,6 +130,7 @@ def wilma_homeworks(session, link_url, subject_text):
                 start = cells[0].get_text(strip=True)
                 description = cells[1].get_text(strip=True)
                 start_obj = datetime.strptime(start, "%d.%m.%Y")
+                #Lisättään yksi tunti, jotta olisi klo 01:00
                 start_aamu = start_obj + timedelta(hours=1)
                 start = start_aamu.isoformat()
                 # Luodaan loppuaika, joka on yksi tunti alkamisen jälkeen
@@ -421,12 +422,23 @@ def main():
     wilma_students = WILMA_STUDENTS
     wilma_stundent = wilma_students.split(",")
     login, session = wilma_signin()
+    
     for student in wilma_stundent:
         print(f"Student: {student}")
-        wilma_exams(*wilma_student(login, session, student))
+        oppilasuri=wilma_student(login, session, student)
+        links_list = wilma_subject(session, oppilasuri)
+        #Linkkilista ei ole tyhjä
+        if links_list:
+            for linkuri, linktext in links_list:
+                # Käsitellään jokainen linkki erikseen
+                print(f"Link URI: {linkuri}, Link Text: {linktext}")
+            
+                wilma_homeworks(session, linkuri, linktext)
+        else:
+            print("No links found")
+        #wilma_exams(*wilma_student(login, session, student))
         
-        wilma_subject(*wilma_student(login, session, student))
-        print("Gone through all students")
+    print("Gone through all students")
 
     # ############################################################################################################
     # #GOOGLE KALENTERI
