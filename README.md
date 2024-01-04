@@ -129,7 +129,7 @@ Habitica API:n dokumentaatio löytyy [täältä](https://habitica.com/apidoc/). 
 | `delete_from_mongodb`      | Poistaa dokumentteja annetusta MongoDB-kokoelmasta. | `collection` (MongoDB-kokoelma), `query` (poistoehto, oletusarvo {}) | Tulostaa poistettujen dokumenttien määrän  |
 
 
-![funktiot](./data/kuvat/funktiot.PNG)
+![funktiot](./data/kuvat/funktiot_muuttujat.PNG)
 
 <!-- ***Wilman funktiot***
 
