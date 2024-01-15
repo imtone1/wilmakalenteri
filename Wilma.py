@@ -73,7 +73,7 @@ def wilma_subject(session, oppilas_url):
                 wilma_homeworks(session, link_url, link_text)
     print(f"Links: {links}")
 
-def wilma_homeworks(session, link_url):
+def wilma_homeworks(session, link_url, link_text):
     '''Haetaan kotitehtävät'''
    
 
@@ -104,7 +104,7 @@ def wilma_homeworks(session, link_url):
                 start_obj = datetime.strptime(start, "%d.%m.%Y")
                 start_aamu = start_obj + timedelta(hours=1)
                 start = start_aamu.isoformat()
-                print(f"Date: {start}, Notes: {description}, Start: {start}")
+                print(f"Date: {start}, Notes: {description}, Subject: {link_text}")
                           
     else:
         print("Table with 'Kotitehtävät' not found or no tbody.")
